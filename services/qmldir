@@ -1,0 +1,7 @@
+singleton AppSearch 1.0 AppSearch.qml
+singleton IconService 1.0 IconService.qml
+singleton ConfigOptions 1.0 ConfigOptions.qml
+# singleton Audio 1.0 Audio.qml  # Temporarily disabled
+singleton Network 1.0 Network.qml
+singleton Bluetooth 1.0 Bluetooth.qml
+singleton Pipewire 1.0 Pipewire.qml 

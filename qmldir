@@ -1,0 +1,4 @@
+module quickshell
+services 1.0 services/
+modules 1.0 modules/
+Widgets 1.0 Widgets/ 

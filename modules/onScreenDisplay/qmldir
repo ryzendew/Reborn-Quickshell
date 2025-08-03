@@ -1,0 +1,3 @@
+module onScreenDisplay
+OnScreenDisplayVolume 1.0 OnScreenDisplayVolume.qml
+OnScreenDisplayMicrophone 1.0 OnScreenDisplayMicrophone.qml 

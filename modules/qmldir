@@ -1,0 +1,5 @@
+module modules
+Bar 1.0 Bar.qml
+onScreenDisplay 1.0 onScreenDisplay/
+OnScreenDisplayVolume 1.0 onScreenDisplay/OnScreenDisplayVolume.qml
+OnScreenDisplayMicrophone 1.0 onScreenDisplay/OnScreenDisplayMicrophone.qml 
