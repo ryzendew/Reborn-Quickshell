@@ -1,0 +1,7 @@
+module settings
+GeneralTab 1.0 GeneralTab.qml
+NetworkTab 1.0 NetworkTab.qml
+WifiTab 1.0 WifiTab.qml
+BluetoothTab 1.0 BluetoothTab.qml
+WallpaperTab 1.0 WallpaperTab.qml
+SoundTab 1.0 SoundTab.qml 

@@ -1,4 +1,4 @@
-import qs.services
+import qs.Services
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts

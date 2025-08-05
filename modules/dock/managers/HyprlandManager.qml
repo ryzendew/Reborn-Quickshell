@@ -373,9 +373,14 @@ Item {
         // Map app IDs to their actual class names
         const appClassMap = {
             "microsoftedgedev": "microsoft-edge-dev",
+            "microsoft-edge-dev": "microsoft-edge-dev",
             "orggnomeptyxis": "org.gnome.Ptyxis",
             "vesktop": "vesktop",
-            "cursor": "cursor"
+            "cursor": "cursor",
+            "cursor-cursor": "cursor",
+            "davinci": "resolve",
+            "davinci-resolve": "resolve",
+            "resolve": "resolve"
         }
         return appClassMap[appId] || appId
     }
@@ -420,6 +425,7 @@ Item {
         // Map app IDs to their actual launch commands
         const appLaunchMap = {
             "microsoftedgedev": "microsoft-edge-dev",
+            "microsoft-edge-dev": "microsoft-edge-dev",
             "orggnomeptyxis": "ptyxis",
             "vesktop": "vesktop",
             "cursor": "cursor",
@@ -441,7 +447,10 @@ Item {
             "mpv": "mpv",
             "obs": "obs",
             "kdenlive": "kdenlive",
-            "davinci": "davinci-resolve",
+            "davinci": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/1",
+            "davinci-resolve": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/1",
+            "resolve": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/1",
+            "net.lutris.davinci-resolve-studio-1.desktop": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/1",
             "krita": "krita",
             "darktable": "darktable",
             "rawtherapee": "rawtherapee",

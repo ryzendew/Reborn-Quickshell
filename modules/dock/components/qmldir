@@ -3,4 +3,5 @@ ApplicationMenu 1.0 ApplicationMenu.qml
 CustomDockMenu 1.0 CustomDockMenu.qml
 DockIcon 1.0 DockIcon.qml
 PinnedApps 1.0 PinnedApps.qml
-RunningApps 1.0 RunningApps.qml 
+RunningApps 1.0 RunningApps.qml
+SettingsWindow 1.0 SettingsWindow.qml 

@@ -1,0 +1,3 @@
+module managers
+HyprlandManager 1.0 HyprlandManager.qml
+PinnedAppsManager 1.0 PinnedAppsManager.qml 

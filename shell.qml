@@ -3,7 +3,7 @@ import QtQuick
 import Quickshell
 // import Quickshell.Services.Pipewire  // Temporarily disabled to avoid route device errors
 import Quickshell.Services.SystemTray
-import qs.services
+import qs.Services
 import qs.modules.bar
 import qs.modules.dock
 import qs.modules.dock.components

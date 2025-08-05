@@ -4,16 +4,17 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
-import "root:/services"
+import qs.Services
 
 PanelWindow {
     id: applicationMenu
+
+    WlrLayershell.namespace: "quickshell:applicationMenu:blur"
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     
     // Floating behavior - don't push other windows out of the way
     exclusiveZone: 0
-    
-    // Set keyboard focus mode to allow input when visible
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
     
     // Timer to delay focus activation
     Timer {
@@ -53,6 +54,7 @@ PanelWindow {
         id: menuContent
         anchors.fill: parent
         color: "#1a1a1a"
+        opacity: 0.8  // Make application menu semi-transparent
         radius: 15
         border.color: "#5700eeff"
         border.width: 1
@@ -317,8 +319,9 @@ PanelWindow {
                     // System buttons using MaterialSymbol like HyprMenu
                     Repeater {
                         model: [
-                            {icon: "lock", tooltip: "Lock", command: ["loginctl", "lock-session"]},
-                            {icon: "logout", tooltip: "Logout", command: ["loginctl", "terminate-session", Quickshell.env("XDG_SESSION_ID")]},
+                            {icon: "refresh", tooltip: "Reload Quickshell", command: ["pkill", "-f", "quickshell"], action: "reload"},
+                            {icon: "lock", tooltip: "Lock", command: ["hyprlock"]},
+                            {icon: "logout", tooltip: "Logout", command: ["hyprctl", "dispatch", "exit"]},
                             {icon: "restart_alt", tooltip: "Restart", command: ["systemctl", "reboot"]},
                             {icon: "power_settings_new", tooltip: "Shutdown", command: ["systemctl", "poweroff"]}
                         ]
@@ -334,6 +337,7 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 text: {
                                     switch(modelData.icon) {
+                                        case "refresh": return "refresh"
                                         case "lock": return "lock"
                                         case "logout": return "logout"
                                         case "restart_alt": return "restart_alt"
@@ -351,7 +355,12 @@ PanelWindow {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 onClicked: {
-                                    Quickshell.execDetached(modelData.command)
+                                    if (modelData.action === "reload") {
+                                        // Use the proper Quickshell reload method
+                                        Quickshell.reload(true)
+                                    } else {
+                                        Quickshell.execDetached(modelData.command)
+                                    }
                                     applicationMenu.visible = false
                                 }
                             }

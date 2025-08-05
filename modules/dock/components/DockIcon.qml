@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
-import qs.services
+import qs.Services
 
 Rectangle {
     id: dockIcon

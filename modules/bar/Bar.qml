@@ -1,14 +1,27 @@
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Wayland
 // import Quickshell.Services.Pipewire  // Temporarily disabled to avoid route device errors
-import qs.services
-import qs.Widgets
+import qs.Services
 import "."
+import "./Components"
 
 // Create a proper panel window
 PanelWindow {
     id: panel
+    
+    // Set the specific screen (DP-1)
+    screen: Quickshell.screens.find(screen => screen.name === "DP-1")
+    
+    // Set layer name for Hyprland blur effects
+    WlrLayershell.namespace: "quickshell:bar:blur"
+    WlrLayershell.layer: WlrLayer.Top
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+    
+    // Make the panel window itself transparent
+    color: "transparent"
     
     // Accept volume properties from parent
     property int volume: 0
@@ -33,54 +46,20 @@ PanelWindow {
         id: bar
         anchors.fill: parent
         color: "#1a1a1a"  // Dark background
+        opacity: 0.8  // Make bar 0.8 transparent
         radius: 0  // Full width bar without rounded corners
         border.color: "#333333"
         border.width: 0
         
         // Bottom border only
-        Rectangle {
-            anchors {
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-            }
-            height: 1
-            color: "#5000eeff"
-        }
+        BottomBorder {}
 
         // Arch Linux button in the top left
-        Rectangle {
-            id: archButton
+        ArchButton {
             anchors {
                 left: parent.left
                 verticalCenter: parent.verticalCenter
                 leftMargin: 4
-            }
-            width: 32
-            height: 32
-            radius: 6
-            color: archMouseArea.containsMouse ? "#333333" : "transparent"
-            border.color: "#00555555"
-            border.width: 1
-            
-            // Arch Linux icon (white version)
-            Image {
-                anchors.centerIn: parent
-                width: 20
-                height: 20
-                source: Qt.resolvedUrl("../../assets/icons/arch-white-symbolic.svg")
-                fillMode: Image.PreserveAspectFit
-                smooth: true
-            }
-            
-            // Mouse area for interactions
-            MouseArea {
-                id: archMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: {
-                    // TODO: Add functionality for the Arch button
-                }
             }
         }
 
@@ -110,37 +89,13 @@ PanelWindow {
             }
         }
 
-        // Time display
-        Text {
+        // Time display - stacked vertically
+        TimeDisplay {
             id: timeDisplay
             anchors {
                 right: indicatorsModule.left
                 verticalCenter: parent.verticalCenter
                 rightMargin: 24
-            }
-            
-            property string currentTime: ""
-            
-            text: currentTime
-            color: "#ffffff"
-            font.pixelSize: 14
-            font.family: "Inter, sans-serif"
-            
-            // Update time every second
-            Timer {
-                interval: 1000
-                running: true
-                repeat: true
-                onTriggered: {
-                    var now = new Date()
-                    timeDisplay.currentTime = Qt.formatDate(now, "MMM dd") + " " + Qt.formatTime(now, "hh:mm AP")
-                }
-            }
-            
-            // Initialize time immediately
-            Component.onCompleted: {
-                var now = new Date()
-                currentTime = Qt.formatDate(now, "MMM dd") + " " + Qt.formatTime(now, "hh:mm AP")
             }
         }
         
