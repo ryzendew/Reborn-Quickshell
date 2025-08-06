@@ -5,6 +5,8 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import qs.Settings
+import Quickshell.Services.Pipewire
 
 PanelWindow {
     id: settingsWindow
@@ -458,8 +460,9 @@ PanelWindow {
                             case 2: return "settings/NetworkTab.qml" // Network will use NetworkTab
                             case 3: return "settings/NetworkTab.qml" // Power will use NetworkTab for now
                             case 4: return "settings/GeneralTab.qml"
+                            case 7: return "settings/DesktopDockTab.qml" // Desktop & Dock tab
                             case 9: return "settings/WallpaperTab.qml" // Wallpaper tab
-                            case 12: return "settings/SoundTab.qml" // Sound tab
+                            case 11: return "settings/SoundTab.qml" // Sound tab (index 11)
                             default: return "settings/GeneralTab.qml"
                         }
                     }

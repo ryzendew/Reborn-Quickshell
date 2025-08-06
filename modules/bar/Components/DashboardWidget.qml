@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import "root:/modules/common"
 
 /**
  * Professional dashboard widget component for system monitoring.
@@ -38,9 +37,9 @@ Rectangle {
             Layout.fillWidth: true
             spacing: Math.max(4, parent.width * 0.01) // Reduced spacing
             
-            StyledText {
+            Text {
                 text: root.title
-                font.pixelSize: Math.max(Appearance.font.pixelSize.medium, parent.height * 0.06) // Reduced font size for more space
+                font.pixelSize: Math.max(14, parent.height * 0.06) // Reduced font size for more space
                 font.weight: Font.Bold
                 color: "white"
                 Layout.fillWidth: true
@@ -184,18 +183,18 @@ Rectangle {
             spacing: Math.max(2, parent.height * 0.008) // Reduced spacing for more content
             
             // Main value
-            StyledText {
+            Text {
                 text: root.valueText
-                font.pixelSize: Math.max(Appearance.font.pixelSize.medium, parent.height * 0.05) // Reduced font size for more space
+                font.pixelSize: Math.max(14, parent.height * 0.05) // Reduced font size for more space
                 font.weight: Font.Bold
                 color: "white"
                 Layout.fillWidth: true
             }
             
             // Subtitle
-            StyledText {
+            Text {
                 text: root.subtitle
-                font.pixelSize: Math.max(Appearance.font.pixelSize.small, parent.height * 0.035) // Reduced font size to fit more content
+                font.pixelSize: Math.max(12, parent.height * 0.035) // Reduced font size to fit more content
                 color: Qt.rgba(1, 1, 1, 0.7)
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap

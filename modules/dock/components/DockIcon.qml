@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import qs.Services
+import qs.Settings
 
 Rectangle {
     id: dockIcon
@@ -26,9 +27,9 @@ Rectangle {
     signal rightClicked()
     
     // Visual properties
-    width: 48
-    height: 48
-    radius: 30
+    width: Settings.settings.dockIconSize || 48
+    height: Settings.settings.dockIconSize || 48
+    radius: (Settings.settings.dockIconSize || 48) / 2
     color: isRunning ? "#004a9eff" : (isHovered ? "#333333" : "transparent")
     border.color: isRunning ? "#00555555" : (isHovered ? "#555555" : "transparent")
     border.width: isRunning ? 1 : (isHovered ? 1 : 0)
@@ -37,8 +38,8 @@ Rectangle {
     Rectangle {
         visible: isRunning
         anchors.fill: parent
-        radius: 30
-        color: "#00ffff"
+        radius: (Settings.settings.dockIconSize || 48) / 2
+        color: Settings.settings.dockActiveIndicatorColor || "#00ffff"
         opacity: 0.3
         
         // Animated glow for running apps
@@ -58,7 +59,7 @@ Rectangle {
         height: parent.height * 1.01
         radius: parent.radius * 1.01
         color: "transparent"
-        border.color: "#00ffff"
+        border.color: Settings.settings.dockActiveIndicatorColor || "#00ffff"
         border.width: 1
         opacity: 0.5
         
@@ -78,7 +79,7 @@ Rectangle {
         width: parent.width * 1.02
         height: parent.height * 1.02
         radius: parent.radius * 1.02
-        color: "#00ffff"
+        color: Settings.settings.dockActiveIndicatorColor || "#00ffff"
         opacity: 0.08
         
         // Animated halo
@@ -102,8 +103,8 @@ Rectangle {
             horizontalCenter: parent.horizontalCenter
             verticalCenter: parent.verticalCenter
         }
-        width: 32
-        height: 32
+        width: (Settings.settings.dockIconSize || 48) * 0.67
+        height: (Settings.settings.dockIconSize || 48) * 0.67
         
         // Simple icon loading using the same approach as ApplicationMenu
         Image {
@@ -127,7 +128,7 @@ Rectangle {
             anchors.centerIn: parent
             text: appId ? appId.split('.').pop() : "?"
             color: "#ffffff"
-            font.pixelSize: 10
+            font.pixelSize: (Settings.settings.dockIconSize || 48) * 0.2
             font.bold: true
             visible: !appIcon.visible
         }
@@ -143,7 +144,7 @@ Rectangle {
         width: 4
         height: 4
         radius: 4
-        color: "#00ccff"
+        color: Settings.settings.dockActiveIndicatorColor || "#00ffff"
 
         z: 5
     }

@@ -31,8 +31,8 @@ PanelWindow {
         console.log("PowerProfilePanel created!")
     }
     
-    // Power profile states
-    property int currentProfile: 0 // 0=balanced, 1=performance, 2=powersaver
+    // Power profile states - use Quickshell's PowerProfiles service
+    property int currentProfile: PowerProfiles.profile
     
     // Background rectangle with blur support
     Rectangle {
@@ -83,9 +83,9 @@ PanelWindow {
                 // Power profile buttons using Material Symbols
                 Repeater {
                     model: [
-                        {icon: "battery_saver", profile: 2, name: "Power Saver"},
-                        {icon: "balance", profile: 0, name: "Balanced"},
-                        {icon: "speed", profile: 1, name: "Performance"}
+                        {icon: "battery_saver", profile: PowerProfile.PowerSaver, name: "Power Saver"},
+                        {icon: "balance", profile: PowerProfile.Balanced, name: "Balanced"},
+                        {icon: "speed", profile: PowerProfile.Performance, name: "Performance"}
                     ]
                     
                     Rectangle {
@@ -110,9 +110,9 @@ PanelWindow {
                             anchors.fill: parent
                             hoverEnabled: true
                             onClicked: {
-                                currentProfile = modelData.profile
+                                // Use Quickshell's PowerProfiles service like the reference code
+                                PowerProfiles.profile = modelData.profile
                                 console.log(modelData.name + " mode selected")
-                                // TODO: Implement actual power profile change
                             }
                         }
                         

@@ -1,7 +1,10 @@
 module settings
+singleton Settings 1.0 Settings.qml
 GeneralTab 1.0 GeneralTab.qml
 NetworkTab 1.0 NetworkTab.qml
 WifiTab 1.0 WifiTab.qml
 BluetoothTab 1.0 BluetoothTab.qml
 WallpaperTab 1.0 WallpaperTab.qml
-SoundTab 1.0 SoundTab.qml 
+SoundTab 1.0 SoundTab.qml
+DesktopDockTab 1.0 DesktopDockTab.qml
+VolumeMixer 1.0 VolumeMixer.qml 

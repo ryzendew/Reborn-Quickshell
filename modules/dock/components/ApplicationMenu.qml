@@ -316,6 +316,271 @@ PanelWindow {
                     anchors.centerIn: parent
                     spacing: 16
                     
+                    // Idle Inhibitor Button
+                    Rectangle {
+                        id: idleInhibitorButton
+                        width: 36
+                        height: 36
+                        radius: 30
+                        color: idleArea.containsMouse ? "#444444" : "transparent"
+                        border.color: isInhibiting ? "#00ffff" : (idleArea.containsMouse ? "#555555" : "transparent")
+                        border.width: isInhibiting ? 2 : (idleArea.containsMouse ? 1 : 0)
+                        property bool isInhibiting: false
+                        
+                        // Active indicator background for when inhibiting
+                        Rectangle {
+                            visible: isInhibiting
+                            anchors.fill: parent
+                            radius: 30
+                            color: "#00ffff"
+                            opacity: 0.2
+                        }
+                        
+                        // Material Design icons using proper font
+                        Text {
+                            anchors.centerIn: parent
+                            text: idleInhibitorButton.isInhibiting ? "coffee" : "bedtime"
+                            font.family: "Material Symbols Outlined"
+                            font.pixelSize: 20
+                            color: "#ffffff"
+                        }
+                        
+                        MouseArea {
+                            id: idleArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: {
+                                if (idleInhibitorButton.isInhibiting) {
+                                    // Re-enable sleep by starting hypridle
+                                    console.log("IdleInhibitor: Re-enabling sleep by starting hypridle")
+                                    startHypridle.startDetached()
+                                    idleInhibitorButton.isInhibiting = false
+                                } else {
+                                    // Disable sleep by killing hypridle
+                                    console.log("IdleInhibitor: Disabling sleep by killing hypridle")
+                                    killHypridle.startDetached()
+                                    idleInhibitorButton.isInhibiting = true
+                                }
+                            }
+                        }
+                        
+                        // Tooltip
+                        Rectangle {
+                            anchors.bottom: parent.top
+                            anchors.bottomMargin: 8
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: idleTooltipText.width + 12
+                            height: idleTooltipText.height + 8
+                            color: "#000000"
+                            opacity: 0.8
+                            radius: 4
+                            visible: idleArea.containsMouse
+                            
+                            Text {
+                                id: idleTooltipText
+                                anchors.centerIn: parent
+                                text: idleInhibitorButton.isInhibiting ? "Sleep disabled - Click to enable" : "Sleep enabled - Click to disable"
+                                color: "#ffffff"
+                                font.pixelSize: 10
+                            }
+                        }
+                        
+                        Behavior on color {
+                            ColorAnimation { duration: 150; easing.type: Easing.OutQuad }
+                        }
+                        
+                        Behavior on border.color {
+                            ColorAnimation { duration: 150; easing.type: Easing.OutQuad }
+                        }
+                        
+                        Behavior on border.width {
+                            NumberAnimation { duration: 150; easing.type: Easing.OutQuad }
+                        }
+                        
+                        Component.onCompleted: {
+                            // On startup, disable sleep by default (kill hypridle)
+                            console.log("IdleInhibitor: Component completed, disabling sleep by default")
+                            killHypridle.startDetached()
+                            idleInhibitorButton.isInhibiting = true
+                            // Delay the status check to allow the kill command to take effect
+                            startupTimer.start()
+                        }
+                        
+                        // Timer to delay the initial status check
+                        Timer {
+                            id: startupTimer
+                            interval: 1000 // 1 second delay
+                            repeat: false
+                            onTriggered: {
+                                console.log("IdleInhibitor: Startup timer triggered, checking hypridle status")
+                                checkHypridleStatus.running = true
+                            }
+                        }
+                        
+                        // Process to kill hypridle (disable sleep)
+                        Process {
+                            id: killHypridle
+                            command: ["pkill", "hypridle"]
+                            onStarted: {
+                                console.log("IdleInhibitor: killHypridle process started")
+                            }
+                        }
+                        
+                        // Process to start hypridle (enable sleep)
+                        Process {
+                            id: startHypridle
+                            command: ["hypridle"]
+                            onStarted: {
+                                console.log("IdleInhibitor: startHypridle process started")
+                            }
+                        }
+                        
+                        // Check hypridle status on startup
+                        Process {
+                            id: checkHypridleStatus
+                            running: true
+                            command: ["pgrep", "hypridle"]
+                            stdout: SplitParser {
+                                onRead: (data) => {
+                                    // If hypridle is running, we're not inhibiting sleep
+                                    // If no output, hypridle is not running, so we are inhibiting
+                                    idleInhibitorButton.isInhibiting = data.trim() === ""
+                                }
+                            }
+                            onRunningChanged: {
+                                if (!running) {
+                                    // Re-check status every 5 seconds
+                                    statusTimer.start()
+                                }
+                            }
+                        }
+                        
+                        // Timer to periodically check hypridle status
+                        Timer {
+                            id: statusTimer
+                            interval: 5000 // 5 seconds
+                            repeat: false
+                            onTriggered: {
+                                checkHypridleStatus.running = true
+                            }
+                        }
+                    }
+                    
+                    // Night Light Button
+                    Rectangle {
+                        id: nightLightButton
+                        width: 36
+                        height: 36
+                        radius: 30
+                        color: nightArea.containsMouse ? "#444444" : "transparent"
+                        border.color: enabled ? "#00ffff" : (nightArea.containsMouse ? "#555555" : "transparent")
+                        border.width: enabled ? 2 : (nightArea.containsMouse ? 1 : 0)
+                        property bool enabled: false // default off
+                        
+                        // Active indicator background for when enabled
+                        Rectangle {
+                            visible: enabled
+                            anchors.fill: parent
+                            radius: 30
+                            color: "#00ffff"
+                            opacity: 0.2
+                        }
+                        
+                        // Material Design icons using proper font
+                        Text {
+                            anchors.centerIn: parent
+                            text: "nightlight"
+                            font.family: "Material Symbols Outlined"
+                            font.pixelSize: 20
+                            color: "#ffffff"
+                        }
+                        
+                        MouseArea {
+                            id: nightArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: {
+                                console.log("NightLight: Button clicked, current state:", nightLightButton.enabled)
+                                nightLightButton.enabled = !nightLightButton.enabled
+                                if (enabled) {
+                                    console.log("NightLight: Enabling night light")
+                                    nightLightOn.startDetached()
+                                } else {
+                                    console.log("NightLight: Disabling night light")
+                                    nightLightOff.startDetached()
+                                }
+                            }
+                        }
+                        
+                        // Tooltip
+                        Rectangle {
+                            anchors.bottom: parent.top
+                            anchors.bottomMargin: 8
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: nightTooltipText.width + 12
+                            height: nightTooltipText.height + 8
+                            color: "#000000"
+                            opacity: 0.8
+                            radius: 4
+                            visible: nightArea.containsMouse
+                            
+                            Text {
+                                id: nightTooltipText
+                                anchors.centerIn: parent
+                                text: "Night Light"
+                                color: "#ffffff"
+                                font.pixelSize: 10
+                            }
+                        }
+                        
+                        Behavior on color {
+                            ColorAnimation { duration: 150; easing.type: Easing.OutQuad }
+                        }
+                        
+                        Behavior on border.color {
+                            ColorAnimation { duration: 150; easing.type: Easing.OutQuad }
+                        }
+                        
+                        Behavior on border.width {
+                            NumberAnimation { duration: 150; easing.type: Easing.OutQuad }
+                        }
+                        
+                        // Process to enable night light
+                        Process {
+                            id: nightLightOn
+                            command: ["gammastep"]
+                            onStarted: {
+                                console.log("NightLight: gammastep process started")
+                            }
+                        }
+                        
+                        // Process to disable night light
+                        Process {
+                            id: nightLightOff
+                            command: ["pkill", "gammastep"]
+                            onStarted: {
+                                console.log("NightLight: pkill gammastep process started")
+                            }
+                        }
+                        
+                        // Process to check night light state
+                        Process {
+                            id: updateNightLightState
+                            running: true
+                            command: ["pidof", "gammastep"]
+                            stdout: SplitParser {
+                                onRead: (data) => {
+                                    // if not empty then set toggled to true
+                                    var wasEnabled = nightLightButton.enabled
+                                    nightLightButton.enabled = data.length > 0
+                                    if (wasEnabled !== nightLightButton.enabled) {
+                                        console.log("NightLight: State updated, enabled:", nightLightButton.enabled)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
                     // System buttons using MaterialSymbol like HyprMenu
                     Repeater {
                         model: [

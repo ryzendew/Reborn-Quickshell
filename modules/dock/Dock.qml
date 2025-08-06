@@ -4,6 +4,8 @@ import Quickshell.Hyprland
 import Quickshell.Wayland
 import "./components"
 import "./managers"
+import qs.Services
+import qs.Settings
 
 PanelWindow {
     id: dock
@@ -23,6 +25,9 @@ PanelWindow {
     anchors {
         bottom: true
     }
+    
+    // Only show dock if settings allow it
+    visible: Settings.settings.showDock !== false
     
     implicitWidth: dockContent.width
     implicitHeight: dockContent.height
@@ -50,19 +55,19 @@ PanelWindow {
         id: dockContent
         anchors.centerIn: parent
         width: dockIcons.width + 20
-        height: 60
+        height: Settings.settings.dockHeight || 60
         color: "#1a1a1a"
         opacity: 0.8
         radius: 30
-        border.color: "#5700eeff"
-        border.width: 1
+        border.color: Settings.settings.dockBorderColor || "#5700eeff"
+        border.width: Settings.settings.dockBorderWidth || 1
         
         // Dock icons container with pinned apps on left, running apps on right
         Row {
             id: dockIcons
             anchors.centerIn: parent
-            spacing: 8
-            height: 48  // Match the height of DockIcon
+            spacing: Settings.settings.dockIconSpacing || 8
+            height: Settings.settings.dockIconSize || 48  // Match the height of DockIcon
             
             // Pinned apps on the left
             PinnedApps {
@@ -104,9 +109,9 @@ PanelWindow {
             // Settings button
             Rectangle {
                 id: settingsButton
-                width: 48
-                height: 48
-                radius: 30
+                width: Settings.settings.dockIconSize || 48
+                height: Settings.settings.dockIconSize || 48
+                radius: (Settings.settings.dockIconSize || 48) / 2
                 color: settingsMouseArea.containsMouse ? "#333333" : "transparent"
                 border.color: settingsMouseArea.containsMouse ? "#555555" : "transparent"
                 border.width: settingsMouseArea.containsMouse ? 1 : 0
@@ -117,7 +122,7 @@ PanelWindow {
                     anchors.centerIn: parent
                     text: "settings"
                     font.family: "Material Symbols Outlined"
-                    font.pixelSize: 24
+                    font.pixelSize: (Settings.settings.dockIconSize || 48) * 0.5
                     color: "#ffffff"
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter

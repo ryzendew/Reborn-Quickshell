@@ -1,0 +1,4 @@
+module DesktopDockSubTabs
+DockTab 1.0 DockTab.qml
+BarTab 1.0 BarTab.qml
+LogoTab 1.0 LogoTab.qml 

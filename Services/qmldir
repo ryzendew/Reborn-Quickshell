@@ -5,4 +5,5 @@ singleton ConfigOptions 1.0 ConfigOptions.qml
 singleton Network 1.0 Network.qml
 singleton Bluetooth 1.0 Bluetooth.qml
 singleton Pipewire 1.0 Pipewire.qml
-singleton Wallpaper 1.0 Wallpaper.qml 
+singleton Wallpaper 1.0 Wallpaper.qml
+singleton Settings 1.0 ../modules/dock/components/settings/Settings.qml 

@@ -57,29 +57,29 @@ QtObject {
     
     // Helper function to check if a device is real
     function isRealDevice(address, name) {
-        console.log("Bluetooth: Checking device:", address, name);
+
         
         // Only allow MAC addresses for real devices
         const macPattern = /^([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}$/;
         
         if (!macPattern.test(address)) {
-            console.log("Bluetooth: Rejected - invalid MAC address");
+
             return false;
         }
         if (!name || name.trim() === '') {
-            console.log("Bluetooth: Rejected - empty name");
+
             return false;
         }
         // Filter out the adapter itself (Media device)
         if (name === "Media") {
-            console.log("Bluetooth: Rejected - Media device");
+
             return false;
         }
         // Filter out RSSI and other noise entries
         if (name.startsWith("RSSI:") || name.startsWith("Discovering:") || name.includes("RSSI:") || 
             name.startsWith("TxPower:") || name.includes("TxPower:") || name.startsWith("ManufacturerData:") ||
             name.startsWith("ServiceData:") || name.startsWith("UUID:") || name.startsWith("Alias:")) {
-            console.log("Bluetooth: Rejected - technical Bluetooth data");
+
             return false;
         }
         // Filter out devices where name is just the address repeated (with various separators)
@@ -87,20 +87,20 @@ QtObject {
         const addressWithUnderscores = address.replace(/:/g, '_');
         const addressNoSeparators = address.replace(/:/g, '');
         if (name === addressWithDashes || name === addressWithUnderscores || name === addressNoSeparators) {
-            console.log("Bluetooth: Rejected - name is just address");
+
             return false;
         }
         // Filter out very short names that are likely not real device names
         if (name.length < 2) {
-            console.log("Bluetooth: Rejected - name too short");
+
             return false;
         }
         // Filter out names that are just numbers or hex values
         if (/^[0-9A-Fa-f\s\-:]+$/.test(name) && name.length < 20) {
-            console.log("Bluetooth: Rejected - name is just hex/number");
+
             return false;
         }
-        console.log("Bluetooth: Device accepted");
+
         return true;
     }
     
@@ -229,7 +229,7 @@ QtObject {
         stdout: SplitParser {
             onRead: data => {
                 let enabled = (parseInt(data) === 1)
-                console.log("Bluetooth status check:", data, "enabled:", enabled)
+
                 root.bluetoothEnabled = enabled
             }
         }
@@ -242,14 +242,14 @@ QtObject {
             property string collectedOutput: ""
             onRead: data => {
                 collectedOutput += data + "\n"
-                console.log("Bluetooth: Device list output:", data)
+
             }
         }
         onRunningChanged: {
             if (!running) {
-                console.log("Bluetooth: Parsing device list...")
+    
                 let devices = root.parseDeviceInfo(updateDevices.stdout.collectedOutput)
-                console.log("Bluetooth: Parsed", devices.length, "devices")
+
                 
                 // Deduplicate by address
                 let uniqueDevices = [];
@@ -261,19 +261,17 @@ QtObject {
                         uniqueDevices.push(devices[i]);
                     }
                 }
-                console.log("Bluetooth: Unique devices:", uniqueDevices.length)
+    
                 
                 // Update paired and connected devices
                 root.pairedDevices = devices.filter(d => d.paired && !d.connected)
                 root.connectedDevices = devices.filter(d => d.connected)
-                console.log("Bluetooth: Paired devices:", root.pairedDevices.length)
-                console.log("Bluetooth: Connected devices:", root.connectedDevices.length)
+                
                 
                 // Update available devices - include all devices that aren't connected
                 let allAvailable = uniqueDevices.filter(d => !d.connected)
                 root.availableDevices = allAvailable
-                console.log("Bluetooth: Available devices:", root.availableDevices.length)
-                console.log("Bluetooth: Available device names:", allAvailable.map(d => d.name))
+                
                 
                 // Notify UI that devices have changed
                 root.devicesChanged()
@@ -312,7 +310,7 @@ QtObject {
             property string collectedOutput: ""
             onRead: data => {
                 collectedOutput += data + "\n"
-                console.log("Scan output:", data)
+
                 
                 // Parse discovered devices in real-time
                 let lines = data.split('\n')
@@ -340,7 +338,7 @@ QtObject {
                                     battery: null
                                 }
                                 root.availableDevices.push(newDevice)
-                                console.log("Found new device:", name, address)
+        
                                 root.devicesChanged()
                             }
                         }
@@ -350,7 +348,7 @@ QtObject {
         }
         onRunningChanged: {
             if (!running) {
-                console.log("Scan completed")
+    
                 root.scanning = false
                 // Stop scanning
                 stopScanProcess.running = true
@@ -393,13 +391,13 @@ QtObject {
     
     // Connect to a device
     function connectDevice(address) {
-        console.log("Bluetooth: Attempting to connect to device:", address)
+
         // For DualSense controllers, try pairing first
         if (address && address.length > 0) {
             // Check if it's a DualSense controller by looking at the device name
             let device = root.availableDevices.find(d => d.address === address)
             if (device && (device.name.includes("DualSense") || device.name.includes("Wireless Controller"))) {
-                console.log("Bluetooth: Detected DualSense controller, pairing first...")
+
                 pairDeviceProcess.address = address
                 pairDeviceProcess.running = true
             } else {
@@ -423,7 +421,7 @@ QtObject {
     
     // Pair with a device
     function pairDevice(address) {
-        console.log("Bluetooth: Attempting to pair with device:", address)
+        
         pairDeviceProcess.address = address
         pairDeviceProcess.running = true
     }
@@ -433,7 +431,7 @@ QtObject {
         command: ["bash", "-c", root.getEnvironmentSetup() + " && bluetoothctl power on"]
         running: false
         onExited: (exitCode, exitStatus) => {
-            console.log("Bluetooth: Power on exit code:", exitCode)
+
             update()
         }
     }
@@ -443,7 +441,7 @@ QtObject {
         command: ["bash", "-c", root.getEnvironmentSetup() + " && bluetoothctl power off"]
         running: false
         onExited: (exitCode, exitStatus) => {
-            console.log("Bluetooth: Power off exit code:", exitCode)
+
             update()
         }
     }
@@ -453,7 +451,7 @@ QtObject {
         command: ["bash", "-c", root.getEnvironmentSetup() + " && bluetoothctl scan off"]
         running: false
         onExited: (exitCode, exitStatus) => {
-            console.log("Bluetooth: Stop scan exit code:", exitCode)
+
         }
     }
     
@@ -463,7 +461,7 @@ QtObject {
         command: ["bash", "-c", root.getEnvironmentSetup() + " && bluetoothctl discoverable " + (enabled ? "on" : "off")]
         running: false
         onExited: (exitCode, exitStatus) => {
-            console.log("Bluetooth: Set discoverable exit code:", exitCode)
+
         }
     }
     
@@ -473,13 +471,13 @@ QtObject {
         command: ["bash", "-c", root.getEnvironmentSetup() + " && bluetoothctl --timeout=30 connect " + address]
         running: false
         onStarted: {
-            console.log("Bluetooth: Starting connect process for address:", address)
+
         }
         onExited: (exitCode, exitStatus) => {
-            console.log("Bluetooth: Connect device exit code:", exitCode, "status:", exitStatus)
+
             // For DualSense controllers, try pairing first if connect fails
             if (exitCode !== 0) {
-                console.log("Bluetooth: Connect failed, attempting to pair first...")
+
                 pairDeviceProcess.address = address
                 pairDeviceProcess.running = true
             } else {
@@ -499,7 +497,7 @@ QtObject {
         command: ["bash", "-c", root.getEnvironmentSetup() + " && bluetoothctl disconnect " + address]
         running: false
         onExited: (exitCode, exitStatus) => {
-            console.log("Bluetooth: Disconnect device exit code:", exitCode)
+
             update()
         }
     }
@@ -510,7 +508,7 @@ QtObject {
         command: ["bash", "-c", root.getEnvironmentSetup() + " && bluetoothctl remove " + address]
         running: false
         onExited: (exitCode, exitStatus) => {
-            console.log("Bluetooth: Remove device exit code:", exitCode)
+
             update()
         }
     }
@@ -521,13 +519,13 @@ QtObject {
         command: ["bash", "-c", root.getEnvironmentSetup() + " && bluetoothctl --timeout=20 pair " + address]
         running: false
         onStarted: {
-            console.log("Bluetooth: Starting pair process for address:", address)
+
         }
         onExited: (exitCode, exitStatus) => {
-            console.log("Bluetooth: Pair device exit code:", exitCode, "status:", exitStatus)
+
             // After pairing, try to connect
             if (exitCode === 0) {
-                console.log("Bluetooth: Pairing successful, attempting to connect...")
+
                 setTimeout(() => {
                     connectDeviceProcess.address = address
                     connectDeviceProcess.running = true

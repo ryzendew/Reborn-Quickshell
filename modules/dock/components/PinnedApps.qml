@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import qs.modules.dock.components
+import qs.Settings
 
 Row {
     id: pinnedAppsContainer
@@ -21,9 +22,9 @@ Row {
     // Arch Linux logo button at the beginning
     Rectangle {
         id: archButton
-        width: 48
-        height: 48
-        radius: 30
+        width: Settings.settings.dockIconSize || 48
+        height: Settings.settings.dockIconSize || 48
+        radius: (Settings.settings.dockIconSize || 48) / 2
         color: archMouseArea.containsMouse ? "#333333" : "transparent"
         border.color: archMouseArea.containsMouse ? "#555555" : "transparent"
         border.width: archMouseArea.containsMouse ? 1 : 0
@@ -31,8 +32,8 @@ Row {
         // Arch Linux icon using root:/ prefix
         Image {
             anchors.centerIn: parent
-            width: 32
-            height: 32
+            width: (Settings.settings.dockIconSize || 48) * 0.67
+            height: (Settings.settings.dockIconSize || 48) * 0.67
             source: "root:/assets/icons/arch-white-symbolic.svg"
             fillMode: Image.PreserveAspectFit
             smooth: true

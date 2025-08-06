@@ -2,7 +2,6 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import qs.Services
 
 Singleton {
     property string shellName: "Quickshell"
@@ -15,6 +14,16 @@ Singleton {
         Component.onCompleted: {
             // ensure settings dir
             Quickshell.execDetached(["mkdir", "-p", settingsDir]);
+            
+            // Log current settings for debugging
+            console.log("Dock settings loaded:");
+            console.log("showDock:", settings.showDock);
+            console.log("dockIconSize:", settings.dockIconSize);
+            console.log("dockHeight:", settings.dockHeight);
+            console.log("dockIconSpacing:", settings.dockIconSpacing);
+            console.log("dockBorderWidth:", settings.dockBorderWidth);
+            console.log("dockBorderColor:", settings.dockBorderColor);
+            console.log("dockActiveIndicatorColor:", settings.dockActiveIndicatorColor);
         }
     }
 
@@ -82,6 +91,12 @@ Singleton {
             property bool showDock: true
             property bool dockExclusive: false
             property var pinnedExecs: []
+            property int dockIconSize: 48
+            property int dockHeight: 60
+            property int dockIconSpacing: 8
+            property int dockBorderWidth: 1
+            property string dockBorderColor: "#5700eeff"
+            property string dockActiveIndicatorColor: "#00ffff"
             
             // Visualizer settings
             property string visualizerType: "radial"

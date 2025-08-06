@@ -191,7 +191,6 @@ Rectangle {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            console.log("WiFi toggle clicked, current state:", Network.wifiEnabled)
                             Network.toggleWifi();
                         }
                     }
@@ -307,15 +306,19 @@ Rectangle {
                     ListView {
                         id: networksList
                         width: parent.width
+                        height: parent.height
                         spacing: 8
                         model: Network.networks || []
+                        property int networkCount: Network.networks ? Network.networks.length : 0
                         visible: Network.wifiEnabled && networksList.count > 0
                         
-                        // Debug info
+                        // Debug info disabled
                         Component.onCompleted: {
-                            console.log("WifiTab: Network.networks length:", Network.networks ? Network.networks.length : 0);
-                            console.log("WifiTab: Network.wifiEnabled:", Network.wifiEnabled);
-                            console.log("WifiTab: Network.isScanning:", Network.isScanning);
+                            // WiFi logs disabled
+                        }
+                        
+                        onModelChanged: {
+                            // WiFi logs disabled
                         }
                         
                         delegate: Rectangle {
