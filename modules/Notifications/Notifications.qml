@@ -42,7 +42,7 @@ PanelWindow {
     focusable: false
     
     // Ensure panel can be wide enough
-    implicitWidth: 400
+    implicitWidth: 600
     implicitHeight: notificationColumn.implicitHeight + 20
     property var notifications: []
     property int maxVisible: 5
@@ -87,7 +87,7 @@ PanelWindow {
             topMargin: 5
         }
         spacing: notificationPanel.spacing
-        width: contentRow.implicitWidth + 90
+        width: 320
         clip: false
         
         // Notification items
@@ -96,7 +96,7 @@ PanelWindow {
             
             Rectangle {
                 id: notificationDelegate
-                width: contentRow.implicitWidth + 40
+                width: parent.width
                 implicitHeight: contentRow.height + 20
                 color: Qt.rgba(0.1, 0.1, 0.1, 0.8)
                 radius: 12
@@ -107,6 +107,7 @@ PanelWindow {
                     id: contentRow
                     anchors.centerIn: parent
                     spacing: 15
+                    width: parent.width - 20
                     
                     // App icon with album art support
                     Rectangle {
@@ -163,7 +164,7 @@ PanelWindow {
                     
                     // Notification content
                     Column {
-                        Layout.fillWidth: true
+                        width: contentRow.width - iconBackground.width - 10
                         spacing: 5
                         
                         Text {
@@ -178,17 +179,25 @@ PanelWindow {
                         
                         Text {
                             text: modelData.summary
+                            width: parent.width
                             color: "#ffffff"
                             font.pixelSize: 20
                             font.family: "Inter, sans-serif"
+                            wrapMode: Text.WordWrap
+                            maximumLineCount: 8
+                            elide: Text.ElideRight
                             visible: text !== ""
                         }
                         
                         Text {
                             text: modelData.body
+                            width: parent.width
                             color: "#cccccc"
                             font.pixelSize: 20
                             font.family: "Inter, sans-serif"
+                            wrapMode: Text.WordWrap
+                            maximumLineCount: 8
+                            elide: Text.ElideRight
                             visible: text !== ""
                         }
                     }

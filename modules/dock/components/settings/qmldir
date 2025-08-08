@@ -7,5 +7,4 @@ BluetoothTab 1.0 BluetoothTab.qml
 WallpaperTab 1.0 WallpaperTab.qml
 SoundTab 1.0 SoundTab.qml
 DesktopDockTab 1.0 DesktopDockTab.qml
-VolumeMixer 1.0 VolumeMixer.qml
-DesktopDockSubTabs 1.0 DesktopDockSubTabs/ 
+VolumeMixer 1.0 VolumeMixer.qml 

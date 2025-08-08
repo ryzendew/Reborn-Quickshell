@@ -5,7 +5,6 @@ import Quickshell
 import qs.Services
 import qs.Settings
 
-
 Rectangle {
     id: currentWallpaperTab
     color: "transparent"
@@ -109,109 +108,6 @@ Rectangle {
                                     color: "#606060"
                                     font.pixelSize: 14
                                 }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Browse Wallpaper Section
-            Rectangle {
-                Layout.fillWidth: true
-                height: 120
-                color: "#1a1a1a"
-                radius: 12
-                border.color: "#33ffffff"
-                border.width: 1
-                
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 20
-                    spacing: 16
-                    
-                    Label {
-                        text: "Browse Wallpaper"
-                        font.pixelSize: 18
-                        font.weight: Font.Medium
-                        color: "white"
-                    }
-                    
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: 12
-                        
-                        TextField {
-                            id: wallpaperPathField
-                            Layout.fillWidth: true
-                            height: 40
-                            text: Settings.settings.currentWallpaper || ""
-                            placeholderText: "Select a wallpaper file..."
-                            readOnly: true
-                            
-                            background: Rectangle {
-                                color: "#0a0a0a"
-                                radius: 6
-                                border.color: "#404040"
-                                border.width: 1
-                            }
-                            
-                            color: "white"
-                            font.pixelSize: 14
-                            horizontalAlignment: TextInput.AlignLeft
-                        }
-                        
-                        Button {
-                            text: "Browse"
-                            height: 40
-                            width: 100
-                            onClicked: {
-                                fileManagerLoader.active = true
-                                fileManagerLoader.item.visible = true
-                            }
-                            
-                            background: Rectangle {
-                                color: parent.pressed ? "#00ffff" : "#333333"
-                                border.color: "#00ffff"
-                                border.width: 1
-                                radius: 6
-                            }
-                            
-                            contentItem: Text {
-                                text: parent.text
-                                color: "#ffffff"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                font.pixelSize: 14
-                            }
-                        }
-                        
-                        Button {
-                            text: "Apply"
-                            height: 40
-                            width: 80
-                            enabled: wallpaperPathField.text !== ""
-                            onClicked: {
-                                if (wallpaperPathField.text !== "") {
-                                    Settings.settings.currentWallpaper = wallpaperPathField.text
-                                    if (Settings.settings.useSWWW) {
-                                        Wallpaper.setCurrentWallpaper(wallpaperPathField.text)
-                                    }
-                                }
-                            }
-                            
-                            background: Rectangle {
-                                color: parent.enabled ? (parent.pressed ? "#00ff00" : "#333333") : "#222222"
-                                border.color: parent.enabled ? "#00ff00" : "#666666"
-                                border.width: 1
-                                radius: 6
-                            }
-                            
-                            contentItem: Text {
-                                text: parent.text
-                                color: parent.enabled ? "#ffffff" : "#666666"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                font.pixelSize: 14
                             }
                         }
                     }
@@ -450,20 +346,6 @@ Rectangle {
                     }
                 }
             }
-        }
-    }
-    
-    // File Manager Component
-    Loader {
-        id: fileManagerLoader
-        active: false
-        source: "../DesktopDockSubTabs/WallpaperSubTabs/FileManager.qml"
-        
-        onLoaded: {
-            item.parentWindow = currentWallpaperTab.Window.window
-            item.onFileSelected.connect(function(filePath) {
-                wallpaperPathField.text = filePath
-            })
         }
     }
 } 
