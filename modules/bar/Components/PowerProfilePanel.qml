@@ -102,7 +102,7 @@ PanelWindow {
                             anchors.centerIn: parent
                             text: modelData.icon
                             font.family: "Material Symbols Outlined"
-                            font.pixelSize: 24 * (Settings.settings.fontSizeMultiplier || 1.0)
+                            font.pixelSize: 24
                             color: currentProfile === modelData.profile ? "#ffffff" : "#888888"
                         }
                         

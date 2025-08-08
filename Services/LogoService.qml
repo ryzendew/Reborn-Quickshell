@@ -13,8 +13,10 @@ Singleton {
     Item {
         Component.onCompleted: {
             loadLogos();
-            loadSavedLogos();
-            settingsFileView.path = `${StandardPaths.writableLocation(StandardPaths.HomeLocation)}/.local/state/Quickshell/Settings.conf`
+            // Wait a bit for ConfigService to be ready, then load saved logos
+            Qt.callLater(function() {
+                loadSavedLogos();
+            });
         }
     }
 
@@ -27,28 +29,15 @@ Singleton {
 
     function loadSavedLogos() {
         try {
-            // Load settings from Settings.conf
-            var settingsFile = Quickshell.env("HOME") + "/.local/state/Quickshell/Settings.conf"
-            var settingsData = Quickshell.Io.readFile(settingsFile)
-            
-            if (settingsData && settingsData.length > 0) {
-                var settings = JSON.parse(settingsData)
-                
-                // Apply saved settings
-                if (settings.barLogo) {
-                    currentBarLogo = settings.barLogo
-                }
-                if (settings.dockLogo) {
-                    currentDockLogo = settings.dockLogo
-                }
-                if (settings.logoColor) {
-                    logoColor = settings.logoColor
-                }
-            } else {
-                // Set defaults if no saved settings
-                currentBarLogo = "arch-symbolic.svg"
-                currentDockLogo = "arch-symbolic.svg"
-                logoColor = "#ffffff"
+            // Load from Settings service
+            if (Settings.settings.barLogo) {
+                currentBarLogo = Settings.settings.barLogo
+            }
+            if (Settings.settings.dockLogo) {
+                currentDockLogo = Settings.settings.dockLogo
+            }
+            if (Settings.settings.logoColor) {
+                logoColor = Settings.settings.logoColor
             }
         } catch (e) {
             // Set defaults if error loading settings
@@ -81,38 +70,11 @@ Singleton {
     }
     
     function saveLogoSettings() {
-        var settings = {
-            barLogo: currentBarLogo,
-            dockLogo: currentDockLogo,
-            logoColor: logoColor
-        }
-        writeSettingsFile(settings)
-    }
-    
-        function writeSettingsFile(settings) {
         try {
-            var settingsJson = JSON.stringify(settings, null, 2)
-            var settingsFile = `${StandardPaths.writableLocation(StandardPaths.HomeLocation)}/.local/state/Quickshell/Settings.conf`
-            
-            // Create the directory if it doesn't exist
-            var dirPath = settingsFile.replace('/Settings.conf', '');
-            Hyprland.dispatch(`exec mkdir -p '${dirPath}'`);
-            
-            // Use a temporary file approach to avoid shell escaping issues
-            var tempFile = dirPath + '/Settings.tmp'
-            var finalFile = settingsFile
-            
-            // Write to temp file first
-            var writeCommand = `echo '${settingsJson.replace(/'/g, "'\"'\"'")}' > '${tempFile}'`
-            Hyprland.dispatch(`exec ${writeCommand}`)
-            
-            // Move temp file to final location
-            Hyprland.dispatch(`exec mv '${tempFile}' '${finalFile}'`)
-            
-            // Reload the FileView to reflect changes
-            if (settingsFileView && settingsFileView.reload) {
-                settingsFileView.reload();
-            }
+            // Save to Settings service
+            Settings.settings.barLogo = currentBarLogo
+            Settings.settings.dockLogo = currentDockLogo
+            Settings.settings.logoColor = logoColor
         } catch (e) {
             // Error saving settings
         }
@@ -126,18 +88,7 @@ Singleton {
         loadSavedLogos()
     }
     
-    function createSettingsConf() {
-        var settings = {
-            barLogo: "arch-symbolic.svg",
-            dockLogo: "arch-symbolic.svg",
-            logoColor: "#ffffff"
-        }
-        writeSettingsFile(settings)
-    }
-    
-    function ensureSettingsFileExists() {
-        createSettingsConf()
-    }
+
 
     // Update logos when config changes - temporarily disabled
     // Connections {
@@ -182,35 +133,5 @@ Singleton {
         }
     }
     
-    // FileView to monitor Settings.conf file (like the reference implementation)
-    FileView {
-        id: settingsFileView
-        // Path will be set after file creation to avoid "file does not exist" warnings
-        
-        onLoaded: {
-            try {
-                var content = text();
-                if (content && content.trim() !== '') {
-                    var settings = JSON.parse(content);
-                    
-                    // Update logo settings from file
-                    if (settings.barLogo && settings.barLogo !== currentBarLogo) {
-                        currentBarLogo = settings.barLogo;
-                    }
-                    if (settings.dockLogo && settings.dockLogo !== currentDockLogo) {
-                        currentDockLogo = settings.dockLogo;
-                    }
-                    if (settings.logoColor && settings.logoColor !== logoColor) {
-                        logoColor = settings.logoColor;
-                    }
-                }
-            } catch (e) {
-                // Error loading Settings.conf
-            }
-        }
-        
-        onLoadFailed: {
-            createSettingsConf();
-        }
-    }
+
 } 

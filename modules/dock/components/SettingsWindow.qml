@@ -40,9 +40,6 @@ PanelWindow {
         if (visible) {
             settingsContent.forceActiveFocus()
             openAnimation.start()
-            // Create Settings.conf file when settings window opens
-            console.log("Calling createSettingsConf()")
-            createSettingsConf()
         } else {
             closeAnimation.start()
             // Save current settings when settings window closes
@@ -83,18 +80,20 @@ PanelWindow {
     function createSettingsConf() {
         console.log("createSettingsConf() called")
         try {
-            // Create initial settings
-            var settings = {
-                barLogo: "arch-symbolic.svg",
-                dockLogo: "arch-symbolic.svg",
-                logoColor: "#ffffff"
-            }
+            // Only create the file if it doesn't exist
+            var settingsFile = Quickshell.env("HOME") + "/.local/state/Quickshell/Settings.conf"
+            var settingsData = Quickshell.Io.readFile(settingsFile)
             
-            saveSettings(settings)
-            console.log("Created initial Settings.conf file successfully")
+            if (!settingsData || settingsData.length === 0) {
+                // File doesn't exist, create empty settings object
+                var settings = {}
+                saveSettings(settings)
+                console.log("Created empty Settings.conf file")
+            } else {
+                console.log("Settings.conf already exists, preserving existing settings")
+            }
         } catch (e) {
-            console.log("Error creating Settings.conf:", e)
-            console.log("Error details:", e.message)
+            console.log("Error in createSettingsConf:", e)
         }
     }
     
@@ -141,49 +140,17 @@ PanelWindow {
                 console.log("Loaded settings:", settings)
                 return settings
             } else {
-                // If file doesn't exist or is empty, create it
-                console.log("Settings file doesn't exist or is empty, creating it")
-                createSettingsConf()
-                return {
-                    barLogo: "arch-symbolic.svg",
-                    dockLogo: "arch-symbolic.svg",
-                    logoColor: "#ffffff"
-                }
+                // If file doesn't exist or is empty, return empty object
+                console.log("Settings file doesn't exist or is empty")
+                return {}
             }
         } catch (e) {
             console.log("Error loading settings:", e)
-            // If there's an error, create the file
-            console.log("Creating settings file due to error")
-            createSettingsConf()
-            return {
-                barLogo: "arch-symbolic.svg",
-                dockLogo: "arch-symbolic.svg",
-                logoColor: "#ffffff"
-            }
+            return {}
         }
     }
     
-    function saveCurrentSettings() {
-        console.log("saveCurrentSettings() called")
-        try {
-            // Load existing settings first
-            var currentSettings = loadSettings()
-            
-            // Update with current LogoService values
-            if (LogoService) {
-                currentSettings.barLogo = LogoService.currentBarLogo || "arch-symbolic.svg"
-                currentSettings.dockLogo = LogoService.currentDockLogo || "arch-symbolic.svg"
-                currentSettings.logoColor = LogoService.logoColor || "#ffffff"
-                console.log("Updated settings with current LogoService values")
-            }
-            
-            // Save the updated settings
-            saveSettings(currentSettings)
-            console.log("Current settings saved successfully")
-        } catch (e) {
-            console.log("Error saving current settings:", e)
-        }
-    }
+
     
             // Main settings content
         Rectangle {
@@ -212,8 +179,6 @@ PanelWindow {
         
         // Close on escape key
         Keys.onEscapePressed: {
-            // Save current settings before closing
-            saveCurrentSettings()
             settingsWindow.visible = false
         }
         
@@ -242,8 +207,6 @@ PanelWindow {
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
-                        // Save current settings before closing
-                        saveCurrentSettings()
                         settingsWindow.visible = false
                     }
                 }
@@ -448,7 +411,8 @@ PanelWindow {
                                     {icon: "wallpaper", text: "Wallpaper", selected: false},
                                     {icon: "notifications", text: "Notifications", selected: false},
                                     {icon: "volume_up", text: "Sound", selected: false},
-                                    {icon: "schedule", text: "Screen Time", selected: false}
+                                    {icon: "schedule", text: "Screen Time", selected: false},
+                                    {icon: "computer", text: "System", selected: false}
                                 ]
                                 
                                 Rectangle {
@@ -582,6 +546,7 @@ PanelWindow {
                             case 7: return "settings/DesktopDockTab.qml" // Desktop & Dock tab
                             case 9: return "settings/WallpaperTab.qml" // Wallpaper tab
                             case 11: return "settings/SoundTab.qml" // Sound tab (index 11)
+                            case 13: return "settings/SystemTab.qml" // System tab (index 13)
                             default: return "settings/GeneralTab.qml"
                         }
                     }

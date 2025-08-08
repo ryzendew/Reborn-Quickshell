@@ -1,10 +1,11 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.Settings
+import qs.Services
 
 ColumnLayout {
     id: timeDisplay
-    spacing: 2
+    spacing: TimeService.timeSpacing
     
     property string currentDate: ""
     property string currentTime: ""
@@ -13,22 +14,25 @@ ColumnLayout {
     Text {
         id: dateText
         text: timeDisplay.currentDate
-        color: "#ffffff"
-        font.pixelSize: 11 * (Settings.settings.fontSizeMultiplier || 1.0)
+        color: TimeService.dateColor
+        font.pixelSize: TimeService.dateSize * (Settings.settings.fontSizeMultiplier || 1.0)
         font.family: "Inter, sans-serif"
+        font.bold: TimeService.dateBold
         horizontalAlignment: Text.AlignHCenter
         Layout.alignment: Qt.AlignHCenter
         Layout.fillWidth: true
         opacity: 1.0  // Ensure text is fully opaque
+        visible: TimeService.showDate
     }
     
     // Time display (bottom)
     Text {
         id: timeText
         text: timeDisplay.currentTime
-        color: "#ffffff"
-        font.pixelSize: 14 * (Settings.settings.fontSizeMultiplier || 1.0)
+        color: TimeService.timeColor
+        font.pixelSize: TimeService.timeSize * (Settings.settings.fontSizeMultiplier || 1.0)
         font.family: "Inter, sans-serif"
+        font.bold: TimeService.timeBold
         horizontalAlignment: Text.AlignHCenter
         Layout.alignment: Qt.AlignHCenter
         Layout.fillWidth: true
@@ -41,16 +45,26 @@ ColumnLayout {
         running: true
         repeat: true
         onTriggered: {
-            var now = new Date()
-            timeDisplay.currentDate = Qt.formatDate(now, "MMM dd")
-            timeDisplay.currentTime = Qt.formatTime(now, "hh:mm AP")
+            updateTime()
         }
+    }
+    
+    // Listen for time service changes
+    Connections {
+        target: TimeService
+        function onTimeSettingsChanged() {
+            updateTime()
+        }
+    }
+    
+    function updateTime() {
+            var now = new Date()
+        timeDisplay.currentDate = TimeService.formatDate(now)
+        timeDisplay.currentTime = TimeService.formatTime(now)
     }
     
     // Initialize time immediately
     Component.onCompleted: {
-        var now = new Date()
-        timeDisplay.currentDate = Qt.formatDate(now, "MMM dd")
-        timeDisplay.currentTime = Qt.formatTime(now, "hh:mm AP")
+        updateTime()
     }
 } 

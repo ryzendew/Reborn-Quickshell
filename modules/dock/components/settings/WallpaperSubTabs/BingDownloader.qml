@@ -20,7 +20,7 @@ Rectangle {
             // Download Settings
             Rectangle {
                 Layout.fillWidth: true
-                height: 200
+                height: 300
                 color: "#1a1a1a"
                 radius: 12
                 border.color: "#33ffffff"

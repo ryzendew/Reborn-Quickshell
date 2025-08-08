@@ -535,7 +535,7 @@ Rectangle {
                 Rectangle {
                     visible: showEthernetSettings
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 300
+                    Layout.preferredHeight: 400
                     color: "#2a2a2a"
                     radius: 8
                     border.color: "#33ffffff"
@@ -557,6 +557,9 @@ Rectangle {
                         ColumnLayout {
                             spacing: 8
                             
+                            property bool dhcpRadio: true
+                            property bool manualRadio: false
+                            
                             Text {
                                 text: "Connection Type"
                                 font.pixelSize: 14
@@ -564,57 +567,80 @@ Rectangle {
                                 color: "#ffffff"
                             }
                             
-                            RowLayout {
-                                spacing: 16
+                            Row {
+                                spacing: 2
                                 
-                                RadioButton {
-                                    id: dhcpRadio
-                                    text: "Automatic (DHCP)"
-                                    checked: true
-                                    indicator: Rectangle {
+                                Row {
+                                    spacing: 8
+                                    
+                                    Rectangle {
                                         width: 16
                                         height: 16
                                         radius: 8
-                                        border.color: dhcpRadio.checked ? "#5700eeff" : "#555555"
+                                        border.color: parent.parent.dhcpRadio ? "#5700eeff" : "#555555"
                                         border.width: 2
+                                        anchors.verticalCenter: parent.verticalCenter
                                         
                                         Rectangle {
                                             width: 8
                                             height: 8
                                             radius: 4
-                                            color: dhcpRadio.checked ? "#5700eeff" : "transparent"
+                                            color: parent.parent.dhcpRadio ? "#5700eeff" : "transparent"
                                             anchors.centerIn: parent
                                         }
                                     }
-                                    contentItem: Text {
-                                        text: parent.text
+                                    
+                                    Text {
+                                        text: "Automatic (DHCP)"
                                         color: "#ffffff"
                                         font.pixelSize: 12
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                    
+                                    MouseArea {
+                                        width: parent.width
+                                        height: parent.height
+                                        onClicked: {
+                                            parent.parent.dhcpRadio = true
+                                            parent.parent.manualRadio = false
+                                        }
                                     }
                                 }
                                 
-                                RadioButton {
-                                    id: manualRadio
-                                    text: "Manual"
-                                    indicator: Rectangle {
+                                Row {
+                                    spacing: 8
+                                    
+                                    Rectangle {
                                         width: 16
                                         height: 16
                                         radius: 8
-                                        border.color: manualRadio.checked ? "#5700eeff" : "#555555"
+                                        border.color: parent.parent.manualRadio ? "#5700eeff" : "#555555"
                                         border.width: 2
+                                        anchors.verticalCenter: parent.verticalCenter
                                         
                                         Rectangle {
                                             width: 8
                                             height: 8
                                             radius: 4
-                                            color: manualRadio.checked ? "#5700eeff" : "transparent"
+                                            color: parent.parent.manualRadio ? "#5700eeff" : "transparent"
                                             anchors.centerIn: parent
                                         }
                                     }
-                                    contentItem: Text {
-                                        text: parent.text
+                                    
+                                    Text {
+                                        text: "Manual"
                                         color: "#ffffff"
                                         font.pixelSize: 12
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                    
+                                    MouseArea {
+                                        width: parent.width
+                                        height: parent.height
+                                        onClicked: {
+                                            parent.parent.dhcpRadio = false
+                                            parent.parent.manualRadio = true
+                                        }
                                     }
                                 }
                             }
@@ -622,7 +648,7 @@ Rectangle {
                         
                         // Manual IP settings (shown when manual is selected)
                         ColumnLayout {
-                            visible: manualRadio.checked
+                            visible: manualRadio
                             spacing: 8
                             
                             Text {
@@ -634,6 +660,7 @@ Rectangle {
                             TextField {
                                 id: ipAddressField
                                 placeholderText: "192.168.1.100"
+                                placeholderTextColor: "#888888"
                                 background: Rectangle {
                                     color: "#333333"
                                     radius: 4
@@ -654,6 +681,7 @@ Rectangle {
                             TextField {
                                 id: subnetMaskField
                                 placeholderText: "255.255.255.0"
+                                placeholderTextColor: "#888888"
                                 background: Rectangle {
                                     color: "#333333"
                                     radius: 4
@@ -674,6 +702,7 @@ Rectangle {
                             TextField {
                                 id: gatewayField
                                 placeholderText: "192.168.1.1"
+                                placeholderTextColor: "#888888"
                                 background: Rectangle {
                                     color: "#333333"
                                     radius: 4
@@ -694,6 +723,7 @@ Rectangle {
                             TextField {
                                 id: dnsField
                                 placeholderText: "8.8.8.8, 8.8.4.4"
+                                placeholderTextColor: "#888888"
                                 background: Rectangle {
                                     color: "#333333"
                                     radius: 4

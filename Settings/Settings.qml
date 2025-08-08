@@ -7,7 +7,7 @@ import qs.Services
 Singleton {
     property string shellName: "Quickshell"
     property string settingsDir: Quickshell.env("QUICKSHELL_SETTINGS_DIR") || (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/" + shellName + "/"
-    property string settingsFile: Quickshell.env("QUICKSHELL_SETTINGS_FILE") || (settingsDir + "Settings.json")
+    property string settingsFile: Quickshell.env("QUICKSHELL_SETTINGS_FILE") || (Quickshell.env("HOME") + "/.local/state/Quickshell/Settings.conf")
     property string themeFile: Quickshell.env("QUICKSHELL_THEME_FILE") || (settingsDir + "Theme.json")
     property var settings: settingAdapter
 
@@ -101,9 +101,30 @@ Singleton {
             // Visualizer settings
             property string visualizerType: "radial"
             
-            // Time/Date settings
+            // Logo settings
+            property string barLogo: "arch-symbolic.svg"
+            property string dockLogo: "arch-symbolic.svg"
+            property string logoColor: "#ffffff"
+            
+            // Time settings
+            property string timeFormat: "12h"
+            property string dateFormat: "MMM dd"
+            property string timezone: "UTC"
+            property bool showSeconds: false
+            property bool showDate: true
+            property bool timeBold: false
+            property bool dateBold: false
+            property int timeSize: 14
+            property int dateSize: 11
+            property int timeSpacing: 2
+            property string timeColor: "#ffffff"
+            property string dateColor: "#ffffff"
+            property string monthFormat: "short"
             property bool reverseDayMonth: false
             property bool use12HourClock: false
+            
+            // User settings
+            property string userImage: ""
         }
     }
 
