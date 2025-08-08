@@ -1,0 +1,5 @@
+module WallpaperSubTabs
+BingDownloader 1.0 BingDownloader.qml
+CurrentWallpaper 1.0 CurrentWallpaper.qml
+WallpaperLibrary 1.0 WallpaperLibrary.qml
+FileManager 1.0 FileManager.qml 

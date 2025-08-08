@@ -4,6 +4,7 @@ import QtQuick.Controls
 import Quickshell
 import Qt5Compat.GraphicalEffects
 import Quickshell.Services.SystemTray
+import qs.Settings
 
 Row {
     property var bar
@@ -47,8 +48,8 @@ Row {
         model: trayAvailable ? systemTray.items : []
         
         delegate: Item {
-            width: 32
-            height: 32
+            width: Settings.settings.systemTraySize || 24
+            height: Settings.settings.systemTraySize || 24
             
             // Better visibility check with error handling
             visible: modelData && modelData.id && modelData.id !== "spotify" && modelData.icon
@@ -75,8 +76,8 @@ Row {
             
             Rectangle {
                 anchors.centerIn: parent
-                width: 40
-                height: 40
+                width: (Settings.settings.systemTraySize || 24) + 8
+                height: (Settings.settings.systemTraySize || 24) + 8
                 radius: 6
                 color: "transparent"
                 clip: true
@@ -84,8 +85,8 @@ Row {
                 Image {
                     id: trayIcon
                     anchors.centerIn: parent
-                    width: 24
-                    height: 24
+                    width: Settings.settings.systemTraySize || 24
+                    height: Settings.settings.systemTraySize || 24
                     smooth: true
                     asynchronous: true
                     fillMode: Image.PreserveAspectFit

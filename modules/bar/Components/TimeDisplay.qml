@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import qs.Settings
 
 ColumnLayout {
     id: timeDisplay
@@ -13,7 +14,7 @@ ColumnLayout {
         id: dateText
         text: timeDisplay.currentDate
         color: "#ffffff"
-        font.pixelSize: 11
+        font.pixelSize: 11 * (Settings.settings.fontSizeMultiplier || 1.0)
         font.family: "Inter, sans-serif"
         horizontalAlignment: Text.AlignHCenter
         Layout.alignment: Qt.AlignHCenter
@@ -26,7 +27,7 @@ ColumnLayout {
         id: timeText
         text: timeDisplay.currentTime
         color: "#ffffff"
-        font.pixelSize: 14
+        font.pixelSize: 14 * (Settings.settings.fontSizeMultiplier || 1.0)
         font.family: "Inter, sans-serif"
         horizontalAlignment: Text.AlignHCenter
         Layout.alignment: Qt.AlignHCenter

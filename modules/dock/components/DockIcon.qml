@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Widgets
 import qs.Services
 import qs.Settings
 
@@ -16,10 +17,45 @@ Rectangle {
     
 
 
-    // Function to get icon path using the robust IconService
-    function getIconPath(appId) {
-        return IconService.getIconPath(appId)
-    }
+            // Function to get icon path using the robust IconService with fuzzy search fallback
+        function getIconPath(appId) {
+            if (appId === 'cursor' || appId === 'equibop' || appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
+                console.log(`DockIcon: Getting icon for "${appId}"`)
+            }
+            
+            // First try the comprehensive IconService
+            const iconPath = IconService.getIconPath(appId)
+            if (appId === 'cursor' || appId === 'equibop' || appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
+                console.log(`DockIcon: IconService returned for "${appId}": ${iconPath}`)
+            }
+            
+            if (iconPath && iconPath !== "image://icon/application-x-executable") {
+                return iconPath
+            }
+            
+            // If IconService returns fallback, try FuzzySearch for better matching
+            try {
+                if (typeof FuzzySearch !== 'undefined') {
+                    if (appId === 'cursor' || appId === 'equibop') {
+                        console.log(`DockIcon: Trying FuzzySearch fallback for "${appId}"`)
+                    }
+                    const fuzzyIcon = FuzzySearch.findBestIcon(appId)
+                    if (appId === 'cursor' || appId === 'equibop') {
+                        console.log(`DockIcon: FuzzySearch returned for "${appId}": ${fuzzyIcon}`)
+                    }
+                    if (fuzzyIcon && fuzzyIcon !== "image://icon/application-x-executable") {
+                        return fuzzyIcon
+                    }
+                }
+            } catch (e) {
+                if (appId === 'cursor' || appId === 'equibop') {
+                    console.log(`DockIcon: FuzzySearch error for "${appId}":`, e)
+                }
+            }
+            
+            // If all else fails, return the IconService result (which should be the fallback)
+            return iconPath
+        }
             
 
     // Signals
@@ -106,18 +142,34 @@ Rectangle {
         width: (Settings.settings.dockIconSize || 48) * 0.67
         height: (Settings.settings.dockIconSize || 48) * 0.67
         
-        // Simple icon loading using the same approach as ApplicationMenu
-        Image {
+
+        
+
+        
+        // Use Quickshell's IconImage widget for proper icon handling
+        IconImage {
             id: appIcon
             anchors.fill: parent
-            fillMode: Image.PreserveAspectFit
-            smooth: true
             source: getIconPath(appId)
             
-            // Fallback icon if the main icon fails
+            // Enhanced fallback handling with fuzzy search
             onStatusChanged: {
                 if (status === Image.Error) {
-                            source = "image://icon/application-x-executable"
+                    // Try fuzzy search as a fallback when icon fails to load
+                    try {
+                        if (typeof FuzzySearch !== 'undefined') {
+                            const fuzzyIcon = FuzzySearch.findBestIcon(appId)
+                            if (fuzzyIcon && fuzzyIcon !== source) {
+                                source = fuzzyIcon
+                                return
+                            }
+                        }
+                    } catch (e) {
+                        // Ignore errors in fuzzy search
+                    }
+                    
+                    // Final fallback to generic executable icon
+                    source = "image://icon/application-x-executable"
                 }
             }
         }
@@ -132,6 +184,9 @@ Rectangle {
             font.bold: true
             visible: !appIcon.visible
         }
+        
+    
+        
     }
     
     // Running indicator
@@ -173,6 +228,8 @@ Rectangle {
                 dockIcon.appClicked()
             } else if (mouse.button === Qt.RightButton) {
                 dockIcon.rightClicked()
+                // Debug logging disabled
+                
                 // Open context menu
                 if (dockWindow && dockWindow.contextMenu) {
                             // If menu is already visible, close it
@@ -192,32 +249,112 @@ Rectangle {
                                 const appWindows = dockWindow.hyprlandManager.appWindows
                                 
                                 if (runningApps.includes(appId)) {
+                                    // Get the launch command for this app
+                                    const launchCommand = dockWindow.hyprlandManager.extractAppName(appId)
                                     appInfo = {
                                         class: appId,
                                         name: appId,
+                                        execString: launchCommand,
                                         toplevels: appWindows[appId] || []
                                     }
-                                    console.log("Running app info:", appInfo)
-                                    console.log("App windows:", appWindows[appId])
+                                                                          // Debug logging disabled
                                 }
                             }
                             
                             // Check if it's a pinned app
                             if (dockWindow.pinnedAppsManager && dockWindow.pinnedAppsManager.pinnedApps) {
-                                const pinnedApp = dockWindow.pinnedAppsManager.pinnedApps.find(app => app.id === appId || app.class === appId)
-                                if (pinnedApp) {
-                                    appInfo = pinnedApp
+                                                                  // Debug logging disabled
+                                
+                                // Use the same logic as RunningApps to check if pinned
+                                let foundPinned = false
+                                for (var i = 0; i < dockWindow.pinnedAppsManager.pinnedApps.length; i++) {
+                                    var pinnedApp = dockWindow.pinnedAppsManager.pinnedApps[i]
+                                    
+                                    // Handle both string and object cases
+                                    if (typeof pinnedApp === 'string') {
+                                        // Direct string match
+                                        if (pinnedApp === appId) {
+                                            foundPinned = true
+                                            break
+                                        }
+                                        
+                                        // Case-insensitive match
+                                        if (pinnedApp.toLowerCase() === appId.toLowerCase()) {
+                                            foundPinned = true
+                                            break
+                                        }
+                                        
+                                        // Special handling for complex app IDs like org.gnome.ptyxis
+                                        if (appId.includes(".")) {
+                                            const parts = appId.split(".")
+                                            const lastPart = parts[parts.length - 1]
+                                            
+                                            if (pinnedApp.toLowerCase().includes(lastPart.toLowerCase())) {
+                                                foundPinned = true
+                                                break
+                                            }
+                                        }
+                                    } else if (typeof pinnedApp === 'object') {
+                                        // Handle object case
+                                        if (pinnedApp.class === appId || pinnedApp.id === appId || pinnedApp.execString === appId) {
+                                            foundPinned = true
+                                            break
+                                        }
+                                        
+                                        // Case-insensitive match
+                                        if (pinnedApp.class && pinnedApp.class.toLowerCase() === appId.toLowerCase()) {
+                                            foundPinned = true
+                                            break
+                                        }
+                                        if (pinnedApp.id && pinnedApp.id.toLowerCase() === appId.toLowerCase()) {
+                                            foundPinned = true
+                                            break
+                                        }
+                                        
+                                        // Special handling for complex app IDs
+                                        if (appId.includes(".")) {
+                                            const parts = appId.split(".")
+                                            const lastPart = parts[parts.length - 1]
+                                            
+                                            if (pinnedApp.class && pinnedApp.class.toLowerCase().includes(lastPart.toLowerCase())) {
+                                                foundPinned = true
+                                                break
+                                            }
+                                            if (pinnedApp.id && pinnedApp.id.toLowerCase().includes(lastPart.toLowerCase())) {
+                                                foundPinned = true
+                                                break
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                if (foundPinned) {
                                     isPinned = true
+                                                                          // Debug logging disabled
+                                } else {
+                                                                          // Debug logging disabled
                                 }
                             }
                             
+                            // Always ensure we have app info, even if app is not running or pinned
+                            if (!appInfo) {
+                                appInfo = {
+                                    class: appId,
+                                    id: appId,
+                                    name: appId
+                                }
+                                                                      // Debug logging disabled
+                            }
+                            
                             // Set context and show menu
+                                                              // Debug logging disabled
                             dockWindow.contextMenu.contextAppInfo = appInfo
                             dockWindow.contextMenu.contextIsPinned = isPinned
                             
                             // Position menu above the dock icon
                             const menuX = (width / 2) - (dockWindow.contextMenu.width / 2)
                             const menuY = -dockWindow.contextMenu.height + 15 // Above the icon
+                                                          // Debug logging disabled
                             dockWindow.contextMenu.showAt(dockIcon, menuX, menuY)
                 }
             }

@@ -30,6 +30,7 @@ Item {
             property var workspaceData: modelData
             
             Component.onCompleted: {
+                console.log(`HyprlandManager: Workspace ${workspaceData.id} has ${workspaceData.toplevels ? workspaceData.toplevels.length : 0} toplevels`)
             }
             
             // Hidden Repeater for toplevels (windows) in this workspace
@@ -43,6 +44,11 @@ Item {
                     property var windowData: modelData
                     
                     Component.onCompleted: {
+                        // Debug logging for all windows
+                        if (modelData && (modelData.class === 'photo.exe' || modelData.class === 'designer.exe' || modelData.appId === 'photo.exe' || modelData.appId === 'designer.exe')) {
+                            console.log(`HyprlandManager: Found Wine app window - class: "${modelData.class}", appId: "${modelData.appId}"`)
+                        }
+                        
                         // Try to get app ID from different sources
                         let appId = null
                         
@@ -81,8 +87,18 @@ Item {
                             }
                         } else if (modelData && modelData.appId) {
                             const appId = hyprlandManager.extractAppId(modelData.appId)
+                            // Debug logging for Affinity apps
+                            if (appId === 'photo.exe' || appId === 'designer.exe' || appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
+                                console.log(`HyprlandManager: X11 app detected - original: "${modelData.appId}", extracted: "${appId}"`)
+                                console.log(`HyprlandManager: Adding to running apps: ${appId}`)
+                            }
                             if (appId && !hyprlandManager.runningApps.includes(appId)) {
                                 hyprlandManager.runningApps.push(appId)
+                                // Also add the original appId if it's different (for Wine apps)
+                                if (modelData.appId !== appId && !hyprlandManager.runningApps.includes(modelData.appId)) {
+                                    hyprlandManager.runningApps.push(modelData.appId)
+                                    console.log(`HyprlandManager: Also adding original appId: ${modelData.appId}`)
+                                }
                                 if (!hyprlandManager.appWorkspaces) hyprlandManager.appWorkspaces = {}
                                 if (!hyprlandManager.appWindows) hyprlandManager.appWindows = {}
                                 hyprlandManager.appWorkspaces[appId] = [workspaceItem.workspaceData.id]
@@ -107,6 +123,11 @@ Item {
                             }
                         } else if (modelData.wayland && modelData.wayland.appId) {
                             const appId = hyprlandManager.extractAppId(modelData.wayland.appId)
+                            // Debug logging for Affinity apps
+                            if (appId === 'photo.exe' || appId === 'designer.exe' || appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
+                                console.log(`HyprlandManager: Wayland app detected - original: "${modelData.wayland.appId}", extracted: "${appId}"`)
+                                console.log(`HyprlandManager: Adding to running apps: ${appId}`)
+                            }
                             if (appId && !hyprlandManager.runningApps.includes(appId)) {
                                 hyprlandManager.runningApps.push(appId)
                                 if (!hyprlandManager.appWorkspaces) hyprlandManager.appWorkspaces = {}
@@ -147,9 +168,16 @@ Item {
         appWorkspaces = {}
         appWindows = {}
         
+        // Debug logging for Affinity apps
+        console.log("HyprlandManager: updateRunningApps - previous apps:", previousApps)
+        console.log("HyprlandManager: updateRunningApps - current running apps:", runningApps)
+        
         // Force the repeater to update
         workspaceRepeater.model = null
         workspaceRepeater.model = Hyprland.workspaces
+        
+        // Debug logging after repeater update
+        console.log("HyprlandManager: updateRunningApps - after repeater update, running apps:", runningApps)
         
         runningAppsChanged()
     }
@@ -209,6 +237,14 @@ Item {
     
     // Check if an app is running
     function isAppRunning(appId) {
+        // Safety check: ensure runningApps is an array
+        if (!Array.isArray(runningApps)) {
+            console.log("Warning: runningApps is not an array:", runningApps)
+            return false
+        }
+        
+
+        
         // Direct match
         if (runningApps.includes(appId)) return true
         
@@ -216,6 +252,8 @@ Item {
         for (var i = 0; i < runningApps.length; i++) {
             if (runningApps[i].toLowerCase() === appId.toLowerCase()) return true
         }
+        
+
         
         // Check with .desktop extension
         if (runningApps.includes(appId + ".desktop")) return true
@@ -226,6 +264,77 @@ Item {
             if (runningApps.includes(withoutDesktop)) return true
         }
         
+        // Wine app specific mapping for desktop entry names
+        const wineAppMap = {
+            'AffinityPhoto.desktop': 'photo.exe',
+            'AffinityDesigner.desktop': 'designer.exe',
+            'AffinityPublisher.desktop': 'publisher.exe'
+        }
+        
+        if (wineAppMap[appId]) {
+            const wineExe = wineAppMap[appId]
+
+            if (runningApps.includes(wineExe)) return true
+        }
+        
+        // Reverse mapping: check if Wine executable maps to this desktop entry
+        const reverseWineMap = {
+            'photo.exe': 'AffinityPhoto.desktop',
+            'designer.exe': 'AffinityDesigner.desktop',
+            'publisher.exe': 'AffinityPublisher.desktop'
+        }
+        
+        if (reverseWineMap[appId]) {
+            const desktopEntry = reverseWineMap[appId]
+            if (appId === 'photo.exe' || appId === 'designer.exe') {
+                console.log(`HyprlandManager: Reverse wine mapping "${appId}" -> "${desktopEntry}"`)
+                console.log(`HyprlandManager: Checking if "${desktopEntry}" is in running apps:`, runningApps.includes(desktopEntry))
+            }
+            if (runningApps.includes(desktopEntry)) return true
+        }
+        
+        // Special handling for complex app IDs like org.gnome.Ptyxis
+        if (appId.includes(".")) {
+            // Try extracting the last part (e.g., "Ptyxis" from "org.gnome.Ptyxis")
+            const parts = appId.split(".")
+            const lastPart = parts[parts.length - 1]
+            
+            // Debug logging for DaVinci Resolve
+            if (appId === 'net.lutris.davinci-resolve-studio-1.desktop') {
+                console.log(`HyprlandManager: Complex app ID - parts:`, parts)
+                console.log(`HyprlandManager: Complex app ID - lastPart: "${lastPart}"`)
+            }
+            
+            // Skip if lastPart is too short, numeric, or a common suffix
+            if (lastPart.length < 3 || /^\d+$/.test(lastPart) || lastPart.toLowerCase() === 'desktop') {
+                if (appId === 'net.lutris.davinci-resolve-studio-1.desktop' || appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
+                    console.log(`HyprlandManager: Skipping short/numeric/suffix lastPart: "${lastPart}" for "${appId}"`)
+                }
+            } else {
+                // Check if any running app contains this last part
+                for (var i = 0; i < runningApps.length; i++) {
+                    if (runningApps[i].toLowerCase().includes(lastPart.toLowerCase())) {
+                        if (appId === 'net.lutris.davinci-resolve-studio-1.desktop') {
+                            console.log(`HyprlandManager: Found match with lastPart "${lastPart}" in "${runningApps[i]}"`)
+                        }
+                        return true
+                    }
+                }
+            }
+            
+            // Try with common variations
+            const variations = [
+                lastPart,
+                lastPart.toLowerCase(),
+                lastPart + ".desktop",
+                lastPart.toLowerCase() + ".desktop"
+            ]
+            
+            for (var i = 0; i < variations.length; i++) {
+                if (runningApps.includes(variations[i])) return true
+            }
+        }
+        
         // Check for common variations
         var variations = [
             appId,
@@ -234,8 +343,47 @@ Item {
             appId.replace(/-/g, "") + ".desktop"
         ]
         
+        // Debug logging for DaVinci Resolve
+        if (appId === 'net.lutris.davinci-resolve-studio-1.desktop') {
+            console.log(`HyprlandManager: Checking variations for "${appId}":`, variations)
+        }
+        
         for (var i = 0; i < variations.length; i++) {
-            if (runningApps.includes(variations[i])) return true
+            if (runningApps.includes(variations[i])) {
+                if (appId === 'net.lutris.davinci-resolve-studio-1.desktop') {
+                    console.log(`HyprlandManager: Found match in variations: "${variations[i]}"`)
+                }
+                return true
+            }
+        }
+        
+        // Reverse check: see if any running app contains this appId
+        // This handles cases where appId is "ptyxis" but running app is "org.gnome.ptyxis"
+        for (var i = 0; i < runningApps.length; i++) {
+            if (runningApps[i].toLowerCase().includes(appId.toLowerCase())) {
+                // Debug logging for DaVinci Resolve
+                if (appId === 'net.lutris.davinci-resolve-studio-1.desktop') {
+                    console.log(`HyprlandManager: Reverse check - "${runningApps[i]}" contains "${appId}"`)
+                }
+                
+                // Additional check to avoid false positives with common suffixes
+                if (appId.toLowerCase().includes('.desktop')) {
+                    // For desktop entries, only match if the running app is exactly the same
+                    // or if it's a Wine app mapping
+                    if (runningApps[i].toLowerCase() === appId.toLowerCase()) {
+                        if (appId === 'net.lutris.davinci-resolve-studio-1.desktop') {
+                            console.log(`HyprlandManager: Exact match found for "${appId}"`)
+                        }
+                        return true
+                    }
+                    // Don't do partial matching for desktop entries to avoid false positives
+                    if (appId === 'net.lutris.davinci-resolve-studio-1.desktop') {
+                        console.log(`HyprlandManager: Skipping partial match for desktop entry "${appId}"`)
+                    }
+                    continue
+                }
+                return true
+            }
         }
         
         return false
@@ -243,8 +391,14 @@ Item {
     
     // Get the workspace where an app is running
     function getAppWorkspace(appId) {
+        // Safety check: ensure appWorkspaces is an object
+        if (!appWorkspaces || typeof appWorkspaces !== 'object') {
+            console.log("Warning: appWorkspaces is not an object:", appWorkspaces)
+            return 1
+        }
+        
         // Direct match
-        if (appWorkspaces && appWorkspaces[appId] && appWorkspaces[appId].length > 0) {
+        if (appWorkspaces[appId] && appWorkspaces[appId].length > 0) {
             return appWorkspaces[appId][0] // Return first workspace
         }
         
@@ -266,6 +420,45 @@ Item {
             var withDesktop = appId + ".desktop"
             if (appWorkspaces && appWorkspaces[withDesktop] && appWorkspaces[withDesktop].length > 0) {
                 return appWorkspaces[withDesktop][0]
+            }
+        }
+        
+        // Wine app specific mapping for desktop entry names
+        const wineAppMap = {
+            'AffinityPhoto.desktop': 'photo.exe',
+            'AffinityDesigner.desktop': 'designer.exe',
+            'AffinityPublisher.desktop': 'publisher.exe'
+        }
+        
+        if (wineAppMap[appId]) {
+            const wineExe = wineAppMap[appId]
+            if (appWorkspaces && appWorkspaces[wineExe] && appWorkspaces[wineExe].length > 0) {
+                return appWorkspaces[wineExe][0]
+            }
+        }
+        
+        // Special handling for complex app IDs like org.gnome.Ptyxis
+        if (appId.includes(".")) {
+            // Try extracting the last part (e.g., "Ptyxis" from "org.gnome.Ptyxis")
+            const parts = appId.split(".")
+            const lastPart = parts[parts.length - 1]
+            
+            if (appWorkspaces && appWorkspaces[lastPart.toLowerCase()] && appWorkspaces[lastPart.toLowerCase()].length > 0) {
+                return appWorkspaces[lastPart.toLowerCase()][0]
+            }
+            
+            // Try with common variations
+            const variations = [
+                lastPart,
+                lastPart.toLowerCase(),
+                lastPart + ".desktop",
+                lastPart.toLowerCase() + ".desktop"
+            ]
+            
+            for (var i = 0; i < variations.length; i++) {
+                if (appWorkspaces && appWorkspaces[variations[i]] && appWorkspaces[variations[i]].length > 0) {
+                    return appWorkspaces[variations[i]][0]
+                }
             }
         }
         
@@ -413,9 +606,32 @@ Item {
     function extractAppId(windowClass) {
         if (!windowClass) return ""
         
+        // Debug logging for Affinity apps
+        if (windowClass === 'photo.exe' || windowClass === 'designer.exe' || windowClass === 'AffinityPhoto.desktop' || windowClass === 'AffinityDesigner.desktop') {
+            console.log(`HyprlandManager: extractAppId called with: "${windowClass}"`)
+        }
+        
+        // Wine app specific mapping to desktop entry names for better icon resolution
+        const wineAppMap = {
+            'photo.exe': 'AffinityPhoto.desktop',
+            'designer.exe': 'AffinityDesigner.desktop',
+            'publisher.exe': 'AffinityPublisher.desktop'
+        }
+        
+        const lowerClass = windowClass.toLowerCase()
+        if (wineAppMap[lowerClass]) {
+            console.log(`HyprlandManager: Mapping window class "${windowClass}" -> "${wineAppMap[lowerClass]}"`)
+            return wineAppMap[lowerClass]
+        }
+        
+        // Debug logging for any Wine app detection
+        if (lowerClass.endsWith('.exe')) {
+            console.log(`HyprlandManager: Wine app detected but not mapped: "${windowClass}"`)
+        }
+        
         // Keep the original window class name, just convert to lowercase
         // This preserves hyphens, dots, and other separators that are important for icon names
-        return windowClass.toLowerCase()
+        return lowerClass
     }
     
     // Extract app name from app ID for launching
@@ -451,6 +667,12 @@ Item {
             "davinci-resolve": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/1",
             "resolve": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/1",
             "net.lutris.davinci-resolve-studio-1.desktop": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/1",
+            "photo.exe": "AffinityPhoto",
+            "designer.exe": "AffinityDesigner",
+            "publisher.exe": "AffinityPublisher",
+            "AffinityPhoto.desktop": "AffinityPhoto",
+            "AffinityDesigner.desktop": "AffinityDesigner",
+            "AffinityPublisher.desktop": "AffinityPublisher",
             "krita": "krita",
             "darktable": "darktable",
             "rawtherapee": "rawtherapee",

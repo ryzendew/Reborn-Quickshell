@@ -4,6 +4,7 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Services.UPower
 import Quickshell.Wayland
+import qs.Settings
 
 PanelWindow {
     id: powerPanel
@@ -101,7 +102,7 @@ PanelWindow {
                             anchors.centerIn: parent
                             text: modelData.icon
                             font.family: "Material Symbols Outlined"
-                            font.pixelSize: 24
+                            font.pixelSize: 24 * (Settings.settings.fontSizeMultiplier || 1.0)
                             color: currentProfile === modelData.profile ? "#ffffff" : "#888888"
                         }
                         

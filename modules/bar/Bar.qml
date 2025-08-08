@@ -5,6 +5,7 @@ import Quickshell.Hyprland
 import Quickshell.Wayland
 // import Quickshell.Services.Pipewire  // Temporarily disabled to avoid route device errors
 import qs.Services
+import qs.Settings
 import "."
 import "./Components"
 
@@ -34,7 +35,7 @@ PanelWindow {
         right: true
     }
     
-    implicitHeight: 40
+    implicitHeight: Settings.settings.barHeight || 40
     margins {
         top: 0
         left: 0
@@ -46,10 +47,11 @@ PanelWindow {
         id: bar
         anchors.fill: parent
         color: "#1a1a1a"  // Dark background
-        opacity: 0.8  // Make bar 0.8 transparent
+        opacity: Settings.settings.dimPanels ? 0.8 : 1.0  // Make bar transparent based on dim panels setting
         radius: 0  // Full width bar without rounded corners
         border.color: "#333333"
         border.width: 0
+        visible: Settings.settings.showTaskbar !== false
         
         // Bottom border only
         BottomBorder {}

@@ -1,0 +1,8 @@
+[32m  INFO[0m: Launching config: "/home/matt/.config/quickshell/shell.qml"
+[32m  INFO[0m: Shell ID: "0a0891c93b66ea478911a5fa18d6b684" Path ID "0a0891c93b66ea478911a5fa18d6b684"
+[32m  INFO[0m: Saving logs to "/run/user/1000/quickshell/by-id/c5l5yo4o0t/log.qslog"
+[33m  WARN[97m scene[0m: @Services/Network.qml[131:-1]: ReferenceError: setTimeout is not defined
+[32m  INFO[97m qt.gui.imageio[0m: libpng warning: iCCP: known incorrect sRGB profile
+[32m  INFO[97m qt.gui.imageio[0m: libpng warning: iCCP: known incorrect sRGB profile
+[33m  WARN[97m scene[0m: @modules/dock/components/ApplicationMenu.qml[334:-1]: ReferenceError: isInhibiting is not defined
+[32m  INFO[0m: Configuration Loaded

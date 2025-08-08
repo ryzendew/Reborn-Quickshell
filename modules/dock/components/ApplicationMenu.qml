@@ -237,14 +237,16 @@ PanelWindow {
                                 Layout.alignment: Qt.AlignHCenter
                                 Layout.preferredWidth: 48
                                 Layout.preferredHeight: 48
-                                source: Quickshell.iconPath(modelData.icon, "application-x-executable")
+                                source: Quickshell.iconPath(modelData.icon, true)
                                 fillMode: Image.PreserveAspectFit
                                 smooth: true
+                                
+
                                 
                                 // Fallback icon
                                 onStatusChanged: {
                                     if (status === Image.Error) {
-                                        source = "image://icon/application-x-executable"
+                                        source = IconService ? IconService.getIconPath("application-x-executable") : "image://icon/application-x-executable"
                                     }
                                 }
                             }
@@ -412,7 +414,7 @@ PanelWindow {
                             interval: 1000 // 1 second delay
                             repeat: false
                             onTriggered: {
-                                console.log("IdleInhibitor: Startup timer triggered, checking hypridle status")
+                                // Debug logging disabled
                                 checkHypridleStatus.running = true
                             }
                         }

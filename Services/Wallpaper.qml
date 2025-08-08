@@ -26,7 +26,8 @@ Singleton {
         scanning = true;
         wallpaperList = [];
         folderModel.folder = "";
-        folderModel.folder = "file://" + (Settings.settings.wallpaperFolder !== undefined ? Settings.settings.wallpaperFolder : "");
+        var wallpaperFolder = Settings.settings.wallpaperFolder || "~/Pictures/Wallpapers"
+        folderModel.folder = "file://" + wallpaperFolder;
     }
 
     function changeWallpaper(path) {
@@ -104,8 +105,9 @@ Singleton {
             if (status === FolderListModel.Ready) {
                 var files = [];
                 var filesSwww = [];
+                var wallpaperFolder = Settings.settings.wallpaperFolder || "~/Pictures/Wallpapers"
                 for (var i = 0; i < count; i++) {
-                    var filepath = (Settings.settings.wallpaperFolder !== undefined ? Settings.settings.wallpaperFolder : "") + "/" + get(i, "fileName");
+                    var filepath = wallpaperFolder + "/" + get(i, "fileName");
                     files.push(filepath);
                 }
                 wallpaperList = files;

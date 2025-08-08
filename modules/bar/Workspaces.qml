@@ -1,11 +1,12 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import qs.Settings
 
 Rectangle {
     id: workspacesContainer
     color: "transparent"
-    border.color: "#00ccff"
+    border.color: Settings.settings.workspaceBorderColor || "#00ccff"
     border.width: 2
     radius: 20
     implicitWidth: workspacesRow.implicitWidth + 4
@@ -68,10 +69,10 @@ Rectangle {
             model: 10
             
             Rectangle {
-                width: 28
-                height: 22
+                width: Settings.settings.taskbarIconSize || 28
+                height: (Settings.settings.taskbarIconSize || 28) - 6
                 radius: 14
-                color: isActive ? "#00ffff" : "#1a1a1a"
+                color: isActive ? (Settings.settings.workspaceIndicatorColor || "#00ffff") : "#1a1a1a"
                 border.color: isActive ? "#ffffff" : "#333333"
                 border.width: isActive ? 2 : 1
                 
@@ -82,7 +83,7 @@ Rectangle {
                     visible: isActive
                     anchors.fill: parent
                     radius: 14
-                    color: "#00ffff"
+                    color: Settings.settings.workspaceIndicatorColor || "#00ffff"
                     opacity: 0.6
                     
                     // Animated glow
@@ -152,7 +153,7 @@ Rectangle {
                     text: (index + 1).toString()
                     anchors.centerIn: parent
                     color: isActive ? "#000000" : "#00ffff"
-                    font.pixelSize: 11
+                    font.pixelSize: Math.max(10, (Settings.settings.taskbarIconSize || 24) * 0.4) * (Settings.settings.fontSizeMultiplier || 1.0)
                     font.family: "Inter, sans-serif"
                     font.bold: isActive
                 }

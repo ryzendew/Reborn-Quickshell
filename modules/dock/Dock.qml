@@ -18,8 +18,19 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     
-    // Accept context menu from parent
-    property var contextMenu: null
+    // Accept context menu from parent (but we'll use our own internal one)
+
+    
+    // Context menu for dock icons
+    CustomDockMenu {
+        id: contextMenu
+        dock: dock
+        visible: false
+        
+        Component.onCompleted: {
+            // Debug logging disabled
+        }
+    }
     
     // Dock configuration - bottom center
     anchors {
@@ -58,7 +69,7 @@ PanelWindow {
         height: Settings.settings.dockHeight || 60
         color: "#1a1a1a"
         opacity: 0.8
-        radius: 30
+        radius: Settings.settings.dockRadius || 30
         border.color: Settings.settings.dockBorderColor || "#5700eeff"
         border.width: Settings.settings.dockBorderWidth || 1
         
@@ -204,7 +215,10 @@ PanelWindow {
         }
     }
     
-    // Expose managers to child components
+    // Expose managers and context menu to child components
     property var hyprlandManager: hyprlandManager
     property var pinnedAppsManager: pinnedAppsManager
+    property var contextMenu: contextMenu
+    
+
 } 

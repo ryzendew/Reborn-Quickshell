@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
 import qs.Services
+import qs.Settings
 
 Rectangle {
     id: indicatorsContainer
@@ -38,8 +39,8 @@ Rectangle {
             id: volumeIndicator
             Layout.fillHeight: true
             Layout.rightMargin: indicatorsRowLayout.realSpacing
-            width: 24
-            height: 24
+            width: Settings.settings.indicatorsSize || 24
+            height: Settings.settings.indicatorsSize || 24
             color: "transparent"
             visible: shell
             
@@ -61,7 +62,7 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 font.family: "Material Symbols Outlined"
-                font.pixelSize: 24
+                font.pixelSize: Settings.settings.indicatorsSize || 24
                 color: "#ffffff"
                 
                 // Direct property binding for reactive updates
@@ -143,8 +144,8 @@ Rectangle {
             id: micIndicator
             Layout.fillHeight: true
             Layout.rightMargin: indicatorsRowLayout.realSpacing
-            width: 20
-            height: 20
+            width: Settings.settings.indicatorsSize || 24
+            height: Settings.settings.indicatorsSize || 24
             color: "transparent"
             visible: shell
             
@@ -164,7 +165,7 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 font.family: "Material Symbols Outlined"
-                font.pixelSize: 24
+                font.pixelSize: Settings.settings.indicatorsSize || 24
                 color: "#ffffff"
                 
                 // Direct property binding for reactive updates
@@ -227,8 +228,8 @@ Rectangle {
         
         // Network icons
         Item {
-            width: 20
-            height: 20
+            width: Settings.settings.indicatorsSize || 24
+            height: Settings.settings.indicatorsSize || 24
             Layout.rightMargin: indicatorsRowLayout.realSpacing - 1.5
             
             RowLayout {
@@ -237,8 +238,8 @@ Rectangle {
                 
                 // Ethernet icon
                 Rectangle {
-                    Layout.preferredWidth: 17
-                    Layout.preferredHeight: 17
+                    Layout.preferredWidth: (Settings.settings.indicatorsSize || 24) - 7
+                    Layout.preferredHeight: (Settings.settings.indicatorsSize || 24) - 7
                     color: "transparent"
                     visible: Network.ethernet
                     
@@ -250,7 +251,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: "lan"
                         font.family: "Material Symbols Outlined"
-                        font.pixelSize: 24
+                        font.pixelSize: Settings.settings.indicatorsSize || 24
                         color: "#ffffff"
                     }
                 }
@@ -258,8 +259,8 @@ Rectangle {
                 // WiFi icon
                 Rectangle {
                     id: wifiIconRect
-                    Layout.preferredWidth: 17
-                    Layout.preferredHeight: 17
+                    Layout.preferredWidth: (Settings.settings.indicatorsSize || 24) - 7
+                    Layout.preferredHeight: (Settings.settings.indicatorsSize || 24) - 7
                     color: "transparent"
                     visible: Network.wifi && !Network.ethernet
                     
@@ -267,7 +268,7 @@ Rectangle {
                         id: wifiIcon
                         anchors.centerIn: parent
                         font.family: "Material Symbols Outlined"
-                        font.pixelSize: 24
+                        font.pixelSize: Settings.settings.indicatorsSize || 24
                         color: "#ffffff"
                         opacity: Network.wifiEnabled ? 1.0 : 0.5
                         
@@ -290,7 +291,7 @@ Rectangle {
                 return "bluetooth_disabled"
             }
             font.family: "Material Symbols Outlined"
-            font.pixelSize: 24
+            font.pixelSize: Settings.settings.indicatorsSize || 24
             color: "#ffffff"
         }
     }

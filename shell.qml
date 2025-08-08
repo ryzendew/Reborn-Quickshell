@@ -8,6 +8,7 @@ import qs.modules.bar
 import qs.modules.dock
 import qs.modules.dock.components
 import qs.modules.onScreenDisplay
+import qs.modules.Notifications
 
 ShellRoot {
     id: root
@@ -87,16 +88,10 @@ ShellRoot {
         }
     }
     
-    // Custom dock menu for right-click actions
-    CustomDockMenu {
-        id: dockMenu
-    }
-    
     // Dock
     Loader {
         active: true
         sourceComponent: Dock {
-            contextMenu: dockMenu
         }
     }
     
@@ -112,6 +107,13 @@ ShellRoot {
         active: true
         sourceComponent: OnScreenDisplayMicrophone {
             shell: root
+        }
+    }
+    
+    // Notifications
+    Loader {
+        active: true
+        sourceComponent: Notifications {
         }
     }
 }

@@ -31,8 +31,6 @@ QtObject {
         "davinci-resolve": "resolve",
         "resolve": "resolve",
         "com.blackmagicdesign.resolve": "resolve",
-        "cursor": "visual-studio-code",
-        "cursor-cursor": "visual-studio-code",
     })
     property var regexSubstitutions: [
         {
@@ -59,14 +57,7 @@ QtObject {
             "regex": /.*davinci.*/i,
             "replace": "resolve"
         },
-        {
-            "regex": /^cursor$/i,
-            "replace": "visual-studio-code"
-        },
-        {
-            "regex": /.*cursor.*/i,
-            "replace": "code"
-        }
+
     ]
 
     readonly property list<DesktopEntry> list: Array.from(DesktopEntries.applications.values)

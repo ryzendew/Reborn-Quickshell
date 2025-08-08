@@ -45,57 +45,120 @@ Item {
     // Save pinned apps to configuration file (like HyprlandDE-Quickshell)
     function savePinnedApps() {
         try {
+            console.log("=== savePinnedApps ===")
+            console.log("Pinned apps to save:", pinnedApps)
+            
             // Create the directory if it doesn't exist
             var dirPath = pinnedAppsFilePath.replace('file://', '').replace('/PinnedApps.conf', '');
+            console.log("Creating directory:", dirPath)
             Hyprland.dispatch(`exec mkdir -p '${dirPath}'`);
             
-            // Write the JSON content to the file
+            // Write the JSON content to the file using a more reliable method
             var jsonContent = JSON.stringify(pinnedApps, null, 2);
-            Hyprland.dispatch(`exec echo '${jsonContent.replace(/'/g, "'\"'\"'")}' > '${pinnedAppsFilePath.replace('file://', '')}'`);
+            console.log("JSON content to write:", jsonContent)
+            
+            // Use a temporary file approach to avoid shell escaping issues
+            var tempFile = dirPath + '/PinnedApps.tmp'
+            var finalFile = pinnedAppsFilePath.replace('file://', '')
+            
+            // Write to temp file first
+            var writeCommand = `echo '${jsonContent.replace(/'/g, "'\"'\"'")}' > '${tempFile}'`
+            console.log("Write command:", writeCommand)
+            Hyprland.dispatch(`exec ${writeCommand}`)
+            
+            // Move temp file to final location
+            Hyprland.dispatch(`exec mv '${tempFile}' '${finalFile}'`)
+            
+            console.log("✓ File saved successfully to:", finalFile)
             
             // Reload the FileView to reflect changes
             pinnedAppsFileView.reload();
         } catch (e) {
-            // Error handling without logging
+            console.log("✗ Error saving pinned apps:", e)
+            console.log("Error details:", e.message || e)
         }
     }
     
     // Check if an app is pinned
     function isPinned(appId) {
-        return pinnedApps.findIndex(app => 
-            app.id === appId || app.class === appId || app.execString === appId
-        ) !== -1
+        return pinnedApps.findIndex(app => {
+            if (typeof app === 'string') {
+                return app === appId
+            } else if (typeof app === 'object') {
+                return app.id === appId || app.class === appId || app.execString === appId
+            }
+            return false
+        }) !== -1
     }
     
     // Pin an app to the dock
     function pinApp(appInfo) {
-        if (!appInfo) return
+        console.log("=== PinnedAppsManager.pinApp ===")
+        console.log("App info:", appInfo)
+        
+        if (!appInfo) {
+            console.log("✗ No app info provided")
+            return
+        }
         
         const appId = appInfo.class || appInfo.id || appInfo.execString
-        if (!appId) return
+        console.log("App ID:", appId)
+        
+        if (!appId) {
+            console.log("✗ No app ID found")
+            return
+        }
         
         // Check if already pinned
-        const existingIndex = pinnedApps.findIndex(app => 
-            app.id === appId || app.class === appId || app.execString === appId
-        )
+        const existingIndex = pinnedApps.findIndex(app => {
+            if (typeof app === 'string') {
+                return app === appId
+            } else if (typeof app === 'object') {
+                return app.id === appId || app.class === appId || app.execString === appId
+            }
+            return false
+        })
+        
+        console.log("Existing index:", existingIndex)
+        console.log("Current pinned apps:", pinnedApps)
         
         if (existingIndex === -1) {
-            // Add the full app info to pinned apps
-            pinnedApps.push(appInfo)
+            // Add the app to pinned apps - use the appId as a string for consistency
+            const appIdToPin = appInfo.class || appInfo.id || appInfo.execString
+            pinnedApps.push(appIdToPin)
+            console.log("✓ App added to pinned apps:", appIdToPin)
             savePinnedApps()
             pinnedAppsChanged()
+        } else {
+            console.log("✓ App already pinned")
         }
     }
     
     // Unpin an app from the dock
     function unpinApp(appId) {
-        const index = pinnedApps.findIndex(app => 
-            app.id === appId || app.class === appId || app.execString === appId
-        )
+        console.log("=== PinnedAppsManager.unpinApp ===")
+        console.log("App ID to unpin:", appId)
+        console.log("Current pinned apps:", pinnedApps)
+        
+        const index = pinnedApps.findIndex(app => {
+            if (typeof app === 'string') {
+                return app === appId
+            } else if (typeof app === 'object') {
+                return app.id === appId || app.class === appId || app.execString === appId
+            }
+            return false
+        })
+        
+        console.log("Found at index:", index)
+        
         if (index > -1) {
+            const removedApp = pinnedApps[index]
             pinnedApps.splice(index, 1)
+            console.log("✓ App removed:", removedApp)
             savePinnedApps()
             pinnedAppsChanged()
+        } else {
+            console.log("✗ App not found in pinned apps")
         }
     }
     

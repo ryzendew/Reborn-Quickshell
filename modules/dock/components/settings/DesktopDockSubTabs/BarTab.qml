@@ -4,393 +4,150 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import qs.Services
+import qs.Settings
 
 Rectangle {
     id: barTab
     color: "transparent"
     
-    ScrollView {
+    // Current sub-tab
+    property int currentSubTab: 0
+    
+    // Function to save settings
+    function saveBarSettings() {
+        // Settings are automatically saved when properties change
+    }
+    
+    // Function to load settings
+    function loadBarSettings() {
+        // Settings are automatically loaded by the Settings service
+    }
+    
+    Component.onCompleted: {
+        loadBarSettings()
+    }
+    
+    ColumnLayout {
         anchors.fill: parent
-        clip: true
+        spacing: 20
         
-        ColumnLayout {
-            width: parent.width
-            spacing: 20
+        // Sub-tab navigation
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 50
+            color: "#2a2a2a"
+            radius: 8
+            border.color: "#33ffffff"
+            border.width: 1
             
-            // Bar Visibility Section
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 120
-                color: "#333333"
-                radius: 8
-                border.color: "#44ffffff"
-                border.width: 1
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: 8
+                spacing: 8
                 
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 16
-                    spacing: 12
+                // Sub-tab buttons
+                Repeater {
+                    model: [
+                        {icon: "settings", text: "General", index: 0},
+                        {icon: "palette", text: "Colors", index: 1},
+                        {icon: "straighten", text: "Sizing", index: 2}
+                    ]
                     
-                    Text {
-                        text: "Bar Visibility"
-                        font.pixelSize: 16
-                        font.weight: Font.Bold
-                        color: "#ffffff"
-                    }
-                    
-                    RowLayout {
+                    Rectangle {
                         Layout.fillWidth: true
-                        spacing: 12
+                        Layout.fillHeight: true
+                        color: currentSubTab === modelData.index ? "#5700eeff" : "transparent"
+                        radius: 6
+                        border.color: currentSubTab === modelData.index ? "#7700eeff" : "transparent"
+                        border.width: 1
                         
-                        Text {
-                            text: "Show Bar"
-                            font.pixelSize: 14
-                            color: "#cccccc"
-                        }
-                        
-                        Item { Layout.fillWidth: true }
-                        
-                        // Toggle switch for show bar (using showTaskbar setting)
-                        Rectangle {
-                            width: 50
-                            height: 24
-                            radius: 12
-                            color: Settings.settings.showTaskbar ? "#5700eeff" : "#444444"
-                            border.color: Settings.settings.showTaskbar ? "#7700eeff" : "#666666"
-                            border.width: 1
+                        RowLayout {
+                            anchors.centerIn: parent
+                            spacing: 8
                             
-                            Rectangle {
-                                width: 20
-                                height: 20
-                                radius: 10
-                                color: "#ffffff"
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: Settings.settings.showTaskbar ? 26 : 2
-                                
-                                Behavior on anchors.leftMargin {
-                                    NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-                                }
+                            Text {
+                                text: modelData.icon
+                                font.family: "Material Symbols Outlined"
+                                font.pixelSize: 18
+                                color: currentSubTab === modelData.index ? "#ffffff" : "#cccccc"
                             }
                             
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    Settings.settings.showTaskbar = !Settings.settings.showTaskbar
-                                }
+                            Text {
+                                text: modelData.text
+                                font.pixelSize: 14
+                                font.weight: currentSubTab === modelData.index ? Font.Medium : Font.Normal
+                                color: currentSubTab === modelData.index ? "#ffffff" : "#cccccc"
                             }
                         }
-                    }
-                    
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: 12
                         
-                        Text {
-                            text: "Dim Panels"
-                            font.pixelSize: 14
-                            color: "#cccccc"
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: {
+                                currentSubTab = modelData.index
+                                console.log("Selected bar sub-tab:", modelData.text)
+                            }
                         }
                         
-                        Item { Layout.fillWidth: true }
+                        Behavior on color {
+                            ColorAnimation { duration: 200; easing.type: Easing.OutCubic }
+                        }
                         
-                        // Toggle switch for dim panels
-                        Rectangle {
-                            width: 50
-                            height: 24
-                            radius: 12
-                            color: Settings.settings.dimPanels ? "#5700eeff" : "#444444"
-                            border.color: Settings.settings.dimPanels ? "#7700eeff" : "#666666"
-                            border.width: 1
-                            
-                            Rectangle {
-                                width: 20
-                                height: 20
-                                radius: 10
-                                color: "#ffffff"
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: Settings.settings.dimPanels ? 26 : 2
-                                
-                                Behavior on anchors.leftMargin {
-                                    NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-                                }
-                            }
-                            
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    Settings.settings.dimPanels = !Settings.settings.dimPanels
-                                }
-                            }
+                        Behavior on border.color {
+                            ColorAnimation { duration: 200; easing.type: Easing.OutCubic }
                         }
                     }
                 }
             }
+        }
+        
+        // Sub-tab content
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            color: "#2a2a2a"
+            radius: 8
+            border.color: "#33ffffff"
+            border.width: 1
             
-            // Bar Content Section
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 200
-                color: "#333333"
-                radius: 8
-                border.color: "#44ffffff"
-                border.width: 1
-                
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 16
-                    spacing: 12
-                    
-                    Text {
-                        text: "Bar Content"
-                        font.pixelSize: 16
-                        font.weight: Font.Bold
-                        color: "#ffffff"
-                    }
-                    
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: 12
-                        
-                        Text {
-                            text: "Show System Info"
-                            font.pixelSize: 14
-                            color: "#cccccc"
-                        }
-                        
-                        Item { Layout.fillWidth: true }
-                        
-                        // Toggle switch for system info
-                        Rectangle {
-                            width: 50
-                            height: 24
-                            radius: 12
-                            color: Settings.settings.showSystemInfoInBar ? "#5700eeff" : "#444444"
-                            border.color: Settings.settings.showSystemInfoInBar ? "#7700eeff" : "#666666"
-                            border.width: 1
-                            
-                            Rectangle {
-                                width: 20
-                                height: 20
-                                radius: 10
-                                color: "#ffffff"
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: Settings.settings.showSystemInfoInBar ? 26 : 2
-                                
-                                Behavior on anchors.leftMargin {
-                                    NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-                                }
-                            }
-                            
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    Settings.settings.showSystemInfoInBar = !Settings.settings.showSystemInfoInBar
-                                }
-                            }
-                        }
-                    }
-                    
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: 12
-                        
-                        Text {
-                            text: "Show Media Controls"
-                            font.pixelSize: 14
-                            color: "#cccccc"
-                        }
-                        
-                        Item { Layout.fillWidth: true }
-                        
-                        // Toggle switch for media controls
-                        Rectangle {
-                            width: 50
-                            height: 24
-                            radius: 12
-                            color: Settings.settings.showMediaInBar ? "#5700eeff" : "#444444"
-                            border.color: Settings.settings.showMediaInBar ? "#7700eeff" : "#666666"
-                            border.width: 1
-                            
-                            Rectangle {
-                                width: 20
-                                height: 20
-                                radius: 10
-                                color: "#ffffff"
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: Settings.settings.showMediaInBar ? 26 : 2
-                                
-                                Behavior on anchors.leftMargin {
-                                    NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-                                }
-                            }
-                            
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    Settings.settings.showMediaInBar = !Settings.settings.showMediaInBar
-                                }
-                            }
-                        }
-                    }
-                    
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: 12
-                        
-                        Text {
-                            text: "Show Active Window Icon"
-                            font.pixelSize: 14
-                            color: "#cccccc"
-                        }
-                        
-                        Item { Layout.fillWidth: true }
-                        
-                        // Toggle switch for active window icon
-                        Rectangle {
-                            width: 50
-                            height: 24
-                            radius: 12
-                            color: Settings.settings.showActiveWindowIcon ? "#5700eeff" : "#444444"
-                            border.color: Settings.settings.showActiveWindowIcon ? "#7700eeff" : "#666666"
-                            border.width: 1
-                            
-                            Rectangle {
-                                width: 20
-                                height: 20
-                                radius: 10
-                                color: "#ffffff"
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: Settings.settings.showActiveWindowIcon ? 26 : 2
-                                
-                                Behavior on anchors.leftMargin {
-                                    NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-                                }
-                            }
-                            
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    Settings.settings.showActiveWindowIcon = !Settings.settings.showActiveWindowIcon
-                                }
-                            }
-                        }
-                    }
-                    
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: 12
-                        
-                        Text {
-                            text: "Show Corners"
-                            font.pixelSize: 14
-                            color: "#cccccc"
-                        }
-                        
-                        Item { Layout.fillWidth: true }
-                        
-                        // Toggle switch for corners
-                        Rectangle {
-                            width: 50
-                            height: 24
-                            radius: 12
-                            color: Settings.settings.showCorners ? "#5700eeff" : "#444444"
-                            border.color: Settings.settings.showCorners ? "#7700eeff" : "#666666"
-                            border.width: 1
-                            
-                            Rectangle {
-                                width: 20
-                                height: 20
-                                radius: 10
-                                color: "#ffffff"
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: Settings.settings.showCorners ? 26 : 2
-                                
-                                Behavior on anchors.leftMargin {
-                                    NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-                                }
-                            }
-                            
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    Settings.settings.showCorners = !Settings.settings.showCorners
-                                }
-                            }
-                        }
+            // Load different sub-tab content
+            Loader {
+                id: subTabLoader
+                anchors.fill: parent
+                anchors.margins: 16
+                source: {
+                    switch(currentSubTab) {
+                        case 0: return "BarGeneralTab.qml"
+                        case 1: return "BarColorsTab.qml"
+                        case 2: return "BarSizingTab.qml"
+                        default: return "BarGeneralTab.qml"
                     }
                 }
-            }
-            
-            // Bar Appearance Section
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 120
-                color: "#333333"
-                radius: 8
-                border.color: "#44ffffff"
-                border.width: 1
                 
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 16
-                    spacing: 12
-                    
-                    Text {
-                        text: "Bar Appearance"
-                        font.pixelSize: 16
-                        font.weight: Font.Bold
-                        color: "#ffffff"
-                    }
-                    
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: 12
-                        
-                        Text {
-                            text: "Font Size Multiplier"
-                            font.pixelSize: 14
-                            color: "#cccccc"
-                        }
-                        
-                        Item { Layout.fillWidth: true }
-                        
-                        // Font size slider
-                        Rectangle {
-                            width: 120
-                            height: 6
-                            radius: 3
-                            color: "#444444"
-                            
-                            Rectangle {
-                                width: parent.width * Settings.settings.fontSizeMultiplier
-                                height: parent.height
-                                radius: 3
-                                color: "#5700eeff"
-                            }
-                            
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    var newMultiplier = Math.max(0.5, Math.min(2.0, mouseX / parent.width))
-                                    Settings.settings.fontSizeMultiplier = Math.round(newMultiplier * 10) / 10
-                                }
-                            }
-                        }
-                        
-                        Text {
-                            text: "x" + Settings.settings.fontSizeMultiplier.toFixed(1)
-                            font.pixelSize: 12
-                            color: "#888888"
-                            Layout.preferredWidth: 30
-                        }
-                    }
+                // Sub-tab transition animation
+                property real slideOffset: 0
+                
+                onSourceChanged: {
+                    // Slide animation for sub-tab changes
+                    slideOffset = 20
+                    subTabSlideAnimation.start()
                 }
+                
+                NumberAnimation {
+                    id: subTabSlideAnimation
+                    target: subTabLoader
+                    property: "slideOffset"
+                    from: 20
+                    to: 0
+                    duration: 300
+                    easing.type: Easing.OutCubic
+                }
+                
+                transform: Translate {
+                    x: subTabLoader.slideOffset
+                }
+                
+                opacity: 1 - (Math.abs(subTabLoader.slideOffset) / 20)
             }
         }
     }

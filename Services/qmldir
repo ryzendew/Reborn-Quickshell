@@ -1,9 +1,13 @@
 singleton AppSearch 1.0 AppSearch.qml
 singleton IconService 1.0 IconService.qml
+singleton FuzzySearch 1.0 FuzzySearch.qml
 singleton ConfigOptions 1.0 ConfigOptions.qml
 # singleton Audio 1.0 Audio.qml  # Temporarily disabled
 singleton Network 1.0 Network.qml
 singleton Bluetooth 1.0 Bluetooth.qml
 singleton Pipewire 1.0 Pipewire.qml
 singleton Wallpaper 1.0 Wallpaper.qml
+singleton BingDownloader 1.0 BingDownloaderService.qml
+singleton LogoService 1.0 LogoService.qml
+singleton ConfigService 1.0 ConfigService.qml
 singleton Settings 1.0 ../modules/dock/components/settings/Settings.qml 

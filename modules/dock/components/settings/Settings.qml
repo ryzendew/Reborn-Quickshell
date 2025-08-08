@@ -48,7 +48,46 @@ Singleton {
         }
         
         onLoadFailed: function(error) {
-            settingAdapter = {}
+            // Create a default settings object with all required properties
+            settingAdapter = {
+                weatherCity: "Dinslaken",
+                useFahrenheit: false,
+                profileImage: Quickshell.env("HOME") + "/.face",
+                wallpaperFolder: Quickshell.env("HOME") + "/.config/quickshell/Wallpaper",
+                currentWallpaper: "",
+                randomWallpaper: false,
+                useWallpaperTheme: false,
+                wallpaperInterval: 300,
+                wallpaperResize: "crop",
+                transitionFps: 60,
+                transitionType: "random",
+                transitionDuration: 1.1,
+                useSWWW: true,
+                bingCountry: "United States",
+                bingResolution: "4K",
+                bingMonth: "Current",
+                videoPath: "~/Videos/",
+                showActiveWindowIcon: false,
+                showSystemInfoInBar: false,
+                showCorners: true,
+                showTaskbar: true,
+                showMediaInBar: false,
+                dimPanels: true,
+                fontSizeMultiplier: 1.0,
+                taskbarIconSize: 24,
+                showDock: true,
+                dockExclusive: false,
+                pinnedExecs: [],
+                dockIconSize: 48,
+                dockHeight: 60,
+                dockIconSpacing: 8,
+                dockBorderWidth: 1,
+                dockBorderColor: "#5700eeff",
+                dockActiveIndicatorColor: "#00ffff",
+                visualizerType: "radial",
+                reverseDayMonth: false,
+                use12HourClock: false
+            }
             writeAdapter()
         }
 
@@ -63,7 +102,7 @@ Singleton {
             property string profileImage: Quickshell.env("HOME") + "/.face"
             
             // Wallpaper settings
-            property string wallpaperFolder: "~/Pictures/Wallpapers"
+            property string wallpaperFolder: Quickshell.env("HOME") + "/.config/quickshell/Wallpaper"
             property string currentWallpaper: ""
             property bool randomWallpaper: false
             property bool useWallpaperTheme: false
@@ -72,7 +111,12 @@ Singleton {
             property int transitionFps: 60
             property string transitionType: "random"
             property real transitionDuration: 1.1
-            property bool useSWWW: false
+            property bool useSWWW: true
+            
+            // Bing wallpaper settings
+            property string bingCountry: "United States"
+            property string bingResolution: "4K"
+            property string bingMonth: "Current"
             
             // Video settings
             property string videoPath: "~/Videos/"

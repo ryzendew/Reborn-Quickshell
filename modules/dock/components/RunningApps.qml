@@ -22,43 +22,96 @@ Row {
     function updateUnpinnedApps() {
         unpinnedAppsModel.clear()
         
+
+        
         // Create a function to check if an app is pinned (handles .desktop extensions)
         function isAppPinned(appId) {
-            // Direct match
-            if (pinnedApps.includes(appId)) return true
-            
-            // Case-insensitive match
+            // Check if any pinned app matches this appId
             for (var i = 0; i < pinnedApps.length; i++) {
-                if (pinnedApps[i].toLowerCase() === appId.toLowerCase()) return true
-            }
-            
-            // Check with .desktop extension
-            if (pinnedApps.includes(appId + ".desktop")) return true
-            
-            // Check without .desktop extension
-            if (appId.endsWith(".desktop")) {
-                var withoutDesktop = appId.substring(0, appId.length - 8)
-                if (pinnedApps.includes(withoutDesktop)) return true
-            }
-            
-            // Check for common variations
-            var variations = [
-                appId,
-                appId + ".desktop",
-                appId.replace(/-/g, ""),
-                appId.replace(/-/g, "") + ".desktop"
-            ]
-            
-            for (var i = 0; i < variations.length; i++) {
-                if (pinnedApps.includes(variations[i])) return true
+                var pinnedApp = pinnedApps[i]
+                
+                // Handle both string and object cases
+                if (typeof pinnedApp === 'string') {
+                    // Direct string match
+                    if (pinnedApp === appId) return true
+                    
+                    // Case-insensitive match
+                    if (pinnedApp.toLowerCase() === appId.toLowerCase()) return true
+                    
+                    // Check with .desktop extension
+                    if (pinnedApp === appId + ".desktop") return true
+                    
+                    // Check without .desktop extension
+                    if (appId.endsWith(".desktop")) {
+                        var withoutDesktop = appId.substring(0, appId.length - 8)
+                        if (pinnedApp === withoutDesktop) return true
+                    }
+                } else if (typeof pinnedApp === 'object') {
+                    // Handle object case (legacy support)
+                    if (pinnedApp.class === appId || pinnedApp.id === appId || pinnedApp.execString === appId) {
+                        return true
+                    }
+                    
+                    // Case-insensitive match
+                    if (pinnedApp.class && pinnedApp.class.toLowerCase() === appId.toLowerCase()) return true
+                    if (pinnedApp.id && pinnedApp.id.toLowerCase() === appId.toLowerCase()) return true
+                    if (pinnedApp.execString && pinnedApp.execString.toLowerCase() === appId.toLowerCase()) return true
+                    
+                    // Check with .desktop extension
+                    if (pinnedApp.class === appId + ".desktop" || pinnedApp.id === appId + ".desktop") return true
+                    
+                    // Check without .desktop extension
+                    if (appId.endsWith(".desktop")) {
+                        var withoutDesktop = appId.substring(0, appId.length - 8)
+                        if (pinnedApp.class === withoutDesktop || pinnedApp.id === withoutDesktop) return true
+                    }
+                }
             }
             
             return false
         }
         
-        var unpinnedApps = runningApps.filter(app => !isAppPinned(app))
+        // Function to get the simplified app ID for grouping
+        function getSimplifiedAppId(appId) {
+            // For desktop entries, use the full name without .desktop extension
+            if (appId.endsWith(".desktop")) {
+                return appId.substring(0, appId.length - 8).toLowerCase()
+            }
+            // For complex app IDs like org.gnome.ptyxis, extract the last part
+            if (appId.includes(".")) {
+                const parts = appId.split(".")
+                return parts[parts.length - 1].toLowerCase()
+            }
+            return appId.toLowerCase()
+        }
+        
+        // Group apps by their simplified ID
+        var groupedApps = {}
+        var unpinnedApps = runningApps.filter(app => !isAppPinned(app)) // Filter out pinned apps to avoid duplication
+        
+        // Debug logging disabled
+        
         for (var i = 0; i < unpinnedApps.length; i++) {
-            unpinnedAppsModel.append({"appId": unpinnedApps[i]})
+            var appId = unpinnedApps[i]
+            var simplifiedId = getSimplifiedAppId(appId)
+            
+            // Debug logging disabled
+            
+            if (!groupedApps[simplifiedId]) {
+                groupedApps[simplifiedId] = appId
+                // Debug logging disabled
+            } else {
+                // Debug logging disabled
+            }
+        }
+        
+        // Debug logging disabled
+        
+        // Add one icon per group
+        for (var simplifiedId in groupedApps) {
+            unpinnedAppsModel.append({"appId": groupedApps[simplifiedId]})
+            
+
         }
     }
     

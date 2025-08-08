@@ -6,6 +6,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.Settings
+import qs.Services
 import Quickshell.Services.Pipewire
 
 PanelWindow {
@@ -13,7 +14,8 @@ PanelWindow {
 
     WlrLayershell.namespace: "quickshell:settings:blur"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+
     
     // Floating behavior - don't push other windows out of the way
     exclusiveZone: 0
@@ -34,11 +36,18 @@ PanelWindow {
     
     // Ensure window gets focus when it becomes visible
     onVisibleChanged: {
+        console.log("Settings window visibility changed to:", visible)
         if (visible) {
             settingsContent.forceActiveFocus()
             openAnimation.start()
+            // Create Settings.conf file when settings window opens
+            console.log("Calling createSettingsConf()")
+            createSettingsConf()
         } else {
             closeAnimation.start()
+            // Save current settings when settings window closes
+            console.log("Settings window closing, saving current settings")
+            saveCurrentSettings()
         }
     }
     
@@ -69,6 +78,113 @@ PanelWindow {
     // Current selected tab
     property int currentTab: 0
     
+
+    
+    function createSettingsConf() {
+        console.log("createSettingsConf() called")
+        try {
+            // Create initial settings
+            var settings = {
+                barLogo: "arch-symbolic.svg",
+                dockLogo: "arch-symbolic.svg",
+                logoColor: "#ffffff"
+            }
+            
+            saveSettings(settings)
+            console.log("Created initial Settings.conf file successfully")
+        } catch (e) {
+            console.log("Error creating Settings.conf:", e)
+            console.log("Error details:", e.message)
+        }
+    }
+    
+    function saveSettings(settings) {
+        try {
+            console.log("=== saveSettings ===")
+            console.log("Settings to save:", settings)
+            
+            // Create the directory if it doesn't exist
+            var settingsDir = Quickshell.env("HOME") + "/.local/state/Quickshell"
+            var settingsFile = settingsDir + "/Settings.conf"
+            console.log("Creating directory:", settingsDir)
+            Hyprland.dispatch(`exec mkdir -p '${settingsDir}'`);
+            
+            // Write the JSON content to the file using a more reliable method
+            var jsonContent = JSON.stringify(settings, null, 2);
+            console.log("JSON content to write:", jsonContent)
+            
+            // Use a temporary file approach to avoid shell escaping issues
+            var tempFile = settingsDir + '/Settings.tmp'
+            var finalFile = settingsFile
+            
+            // Write to temp file first
+            var writeCommand = `echo '${jsonContent.replace(/'/g, "'\"'\"'")}' > '${tempFile}'`
+            console.log("Write command:", writeCommand)
+            Hyprland.dispatch(`exec ${writeCommand}`)
+            
+            // Move temp file to final location
+            Hyprland.dispatch(`exec mv '${tempFile}' '${finalFile}'`)
+            
+            console.log("✓ Settings file saved successfully to:", finalFile)
+        } catch (e) {
+            console.log("✗ Error saving settings:", e)
+            console.log("Error details:", e.message || e)
+        }
+    }
+    
+    function loadSettings() {
+        try {
+            var settingsFile = Quickshell.env("HOME") + "/.local/state/Quickshell/Settings.conf"
+            var settingsData = Quickshell.Io.readFile(settingsFile)
+            if (settingsData && settingsData.length > 0) {
+                var settings = JSON.parse(settingsData)
+                console.log("Loaded settings:", settings)
+                return settings
+            } else {
+                // If file doesn't exist or is empty, create it
+                console.log("Settings file doesn't exist or is empty, creating it")
+                createSettingsConf()
+                return {
+                    barLogo: "arch-symbolic.svg",
+                    dockLogo: "arch-symbolic.svg",
+                    logoColor: "#ffffff"
+                }
+            }
+        } catch (e) {
+            console.log("Error loading settings:", e)
+            // If there's an error, create the file
+            console.log("Creating settings file due to error")
+            createSettingsConf()
+            return {
+                barLogo: "arch-symbolic.svg",
+                dockLogo: "arch-symbolic.svg",
+                logoColor: "#ffffff"
+            }
+        }
+    }
+    
+    function saveCurrentSettings() {
+        console.log("saveCurrentSettings() called")
+        try {
+            // Load existing settings first
+            var currentSettings = loadSettings()
+            
+            // Update with current LogoService values
+            if (LogoService) {
+                currentSettings.barLogo = LogoService.currentBarLogo || "arch-symbolic.svg"
+                currentSettings.dockLogo = LogoService.currentDockLogo || "arch-symbolic.svg"
+                currentSettings.logoColor = LogoService.logoColor || "#ffffff"
+                console.log("Updated settings with current LogoService values")
+            }
+            
+            // Save the updated settings
+            saveSettings(currentSettings)
+            console.log("Current settings saved successfully")
+        } catch (e) {
+            console.log("Error saving current settings:", e)
+        }
+    }
+    
             // Main settings content
         Rectangle {
             id: settingsContent
@@ -96,6 +212,8 @@ PanelWindow {
         
         // Close on escape key
         Keys.onEscapePressed: {
+            // Save current settings before closing
+            saveCurrentSettings()
             settingsWindow.visible = false
         }
         
@@ -124,6 +242,8 @@ PanelWindow {
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
+                        // Save current settings before closing
+                        saveCurrentSettings()
                         settingsWindow.visible = false
                     }
                 }
@@ -253,7 +373,7 @@ PanelWindow {
                     // User profile section
                     Rectangle {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 64
+                        Layout.preferredHeight: 90
                         color: "#333333"
                         radius: 8
                         border.color: "#44ffffff"
@@ -266,8 +386,8 @@ PanelWindow {
                             
                             // User avatar
                             Rectangle {
-                                width: 32
-                                height: 32
+                                width: 64
+                                height: 64
                                 radius: 16
                                 color: "#5700eeff"
                                 border.color: "#7700eeff"
@@ -276,7 +396,7 @@ PanelWindow {
                                 Text {
                                     anchors.centerIn: parent
                                     text: "QS"
-                                    font.pixelSize: 12
+                                    font.pixelSize: 20
                                     font.weight: Font.Bold
                                     color: "#ffffff"
                                 }
@@ -311,7 +431,7 @@ PanelWindow {
                         
                         ColumnLayout {
                             width: parent.width
-                            spacing: 2
+                            spacing: 24
                             
                             // Settings categories
                             Repeater {
@@ -328,7 +448,6 @@ PanelWindow {
                                     {icon: "wallpaper", text: "Wallpaper", selected: false},
                                     {icon: "notifications", text: "Notifications", selected: false},
                                     {icon: "volume_up", text: "Sound", selected: false},
-                                    {icon: "focus_mode", text: "Focus", selected: false},
                                     {icon: "schedule", text: "Screen Time", selected: false}
                                 ]
                                 
@@ -355,7 +474,7 @@ PanelWindow {
                                         
                                         Text {
                                             text: modelData.text
-                                            font.pixelSize: 12
+                                            font.pixelSize: 18
                                             font.weight: currentTab === index ? Font.Medium : Font.Normal
                                             color: currentTab === index ? "#ffffff" : "#cccccc"
                                             Layout.fillWidth: true
@@ -458,7 +577,7 @@ PanelWindow {
                             case 0: return "settings/WifiTab.qml"
                             case 1: return "settings/BluetoothTab.qml" // Bluetooth tab
                             case 2: return "settings/NetworkTab.qml" // Network will use NetworkTab
-                            case 3: return "settings/NetworkTab.qml" // Power will use NetworkTab for now
+                            case 3: return "settings/PowerTab.qml" // Power tab
                             case 4: return "settings/GeneralTab.qml"
                             case 7: return "settings/DesktopDockTab.qml" // Desktop & Dock tab
                             case 9: return "settings/WallpaperTab.qml" // Wallpaper tab

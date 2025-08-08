@@ -15,14 +15,14 @@ Singleton {
     property int updateInterval: 1000
     
     // Default audio sink properties
-    property real sinkVolume: 0.0
+    property real sinkVolume: 1.0
     property bool sinkMuted: false
     property string sinkName: ""
     property string sinkDescription: ""
     property string sinkId: ""
     
     // Default audio source properties
-    property real sourceVolume: 0.0
+    property real sourceVolume: 1.0
     property bool sourceMuted: false
     property string sourceName: ""
     property string sourceDescription: ""

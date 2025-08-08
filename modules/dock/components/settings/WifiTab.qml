@@ -322,7 +322,7 @@ Rectangle {
                         }
                         
                         delegate: Rectangle {
-                            width: parent.width
+                            width: networksList ? networksList.width : 400
                             height: 64
                             color: networkArea.containsMouse ? "#333333" : "transparent"
                             radius: 8

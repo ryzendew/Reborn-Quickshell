@@ -20,7 +20,7 @@ Scope {
     }
     
     function triggerOsd() {
-        console.log("Volume OSD triggered!")
+        // Debug logging disabled
         showOsdValues = true
         osdTimeout.restart()
     }
@@ -42,7 +42,7 @@ Scope {
         // Listen to volume changes from shell
         target: shell
         function onVolumeChanged() {
-            console.log("Volume OSD received volumeChanged signal:", shell.volume)
+            // Debug logging disabled
             root.triggerOsd()
         }
         function onVolumeMutedChanged() {

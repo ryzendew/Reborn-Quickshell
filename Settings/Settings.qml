@@ -78,10 +78,25 @@ Singleton {
             property real fontSizeMultiplier: 1.0
             property int taskbarIconSize: 24
             
+            // Bar settings
+            property int barHeight: 40
+            property string workspaceBorderColor: "#00ccff"
+            property string workspaceIndicatorColor: "#00ffff"
+            property int systemTraySize: 24
+            property int indicatorsSize: 24
+            property int barLogoSize: 24
+            
             // Dock settings
             property bool showDock: true
             property bool dockExclusive: false
             property var pinnedExecs: []
+            property int dockIconSize: 48
+            property int dockHeight: 60
+            property int dockIconSpacing: 8
+            property int dockBorderWidth: 1
+            property int dockRadius: 30
+            property string dockBorderColor: "#5700eeff"
+            property string dockActiveIndicatorColor: "#00ffff"
             
             // Visualizer settings
             property string visualizerType: "radial"

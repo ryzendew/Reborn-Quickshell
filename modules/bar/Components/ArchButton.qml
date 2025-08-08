@@ -1,12 +1,15 @@
 import QtQuick
 import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
 import "."
+import qs.Services
+import qs.Settings
 
 Rectangle {
     id: archButton
     
-    width: 32
-    height: 32
+    width: Settings.settings.barLogoSize || 24
+    height: Settings.settings.barLogoSize || 24
     radius: 6
     color: archMouseArea.containsMouse ? "#333333" : "transparent"
     border.color: archMouseArea.containsMouse ? "#555555" : "transparent"
@@ -15,15 +18,33 @@ Rectangle {
     // Power panel visibility
     property bool powerPanelVisible: false
     
-    // Arch Linux icon (white version)
+    // Dynamic logo from LogoService
     Image {
+        id: logoImage
         anchors.centerIn: parent
-        width: 20
-        height: 20
-        source: Qt.resolvedUrl("../../../assets/icons/arch-white-symbolic.svg")
+        width: Settings.settings.barLogoSize || 24
+        height: Settings.settings.barLogoSize || 24
+        source: LogoService.getLogoPath(LogoService.currentBarLogo)
         fillMode: Image.PreserveAspectFit
-        smooth: true
-        opacity: 1.0  // Ensure icon is fully opaque
+        smooth: false
+        mipmap: true
+        cache: true
+        sourceSize.width: 64
+        sourceSize.height: 64
+        
+        // Fallback to a generic icon if logo not found
+        onStatusChanged: {
+            if (status === Image.Error) {
+                source = "image://icon/system-linux"
+            }
+        }
+    }
+    
+    // Dynamic color overlay for the logo
+    ColorOverlay {
+        anchors.fill: logoImage
+        source: logoImage
+        color: LogoService.logoColor
     }
     
     // Mouse area for interactions

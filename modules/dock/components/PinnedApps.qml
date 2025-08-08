@@ -1,12 +1,15 @@
 import QtQuick
+import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Hyprland
 import qs.modules.dock.components
 import qs.Settings
+import qs.Services
 
 Row {
     id: pinnedAppsContainer
-    spacing: 4
+    spacing: Settings.settings.dockIconSpacing || 8
     
     // Property to receive the pinned apps from parent
     property var pinnedApps: []
@@ -29,23 +32,33 @@ Row {
         border.color: archMouseArea.containsMouse ? "#555555" : "transparent"
         border.width: archMouseArea.containsMouse ? 1 : 0
         
-        // Arch Linux icon using root:/ prefix
+        // Dynamic logo from LogoService
         Image {
+            id: dockLogoImage
             anchors.centerIn: parent
             width: (Settings.settings.dockIconSize || 48) * 0.67
             height: (Settings.settings.dockIconSize || 48) * 0.67
-            source: "root:/assets/icons/arch-white-symbolic.svg"
+            source: LogoService.getLogoPath(LogoService.currentDockLogo)
             fillMode: Image.PreserveAspectFit
-            smooth: true
-            sourceSize.width: parent.width
-            sourceSize.height: parent.height
+            smooth: false
+            mipmap: true
+            cache: true
+            sourceSize.width: 64
+            sourceSize.height: 64
             
-            // Fallback to a generic system icon if arch-linux icon not found
+            // Fallback to a generic system icon if logo not found
             onStatusChanged: {
                 if (status === Image.Error) {
-                    source = "image://icon/system-linux"
+                    source = IconService ? IconService.getIconPath("system-linux") : "image://icon/system-linux"
                 }
             }
+        }
+        
+        // Dynamic color overlay for the dock logo
+        ColorOverlay {
+            anchors.fill: dockLogoImage
+            source: dockLogoImage
+            color: LogoService.logoColor
         }
         
         MouseArea {
@@ -102,19 +115,43 @@ Row {
         model: pinnedApps
         
         DockIcon {
-            appId: modelData
+            appId: typeof modelData === 'string' ? modelData : (modelData.class || modelData.id || modelData.execString)
             isPinned: true
-            isRunning: hyprlandManager ? hyprlandManager.isAppRunning(modelData) : false
-            workspace: hyprlandManager ? hyprlandManager.getAppWorkspace(modelData) : 1
+            isRunning: hyprlandManager ? hyprlandManager.isAppRunning(typeof modelData === 'string' ? modelData : (modelData.class || modelData.id || modelData.execString)) : false
+            workspace: hyprlandManager ? hyprlandManager.getAppWorkspace(typeof modelData === 'string' ? modelData : (modelData.class || modelData.id || modelData.execString)) : 1
             dockWindow: pinnedAppsContainer.dockWindow
-            onAppClicked: {
-                if (hyprlandManager) {
-                    const isRunning = hyprlandManager.isAppRunning(modelData)
-                    hyprlandManager.handleAppClick(modelData, isRunning)
+            
+            // Debug logging for running state
+            onIsRunningChanged: {
+                const appId = typeof modelData === 'string' ? modelData : (modelData.class || modelData.id || modelData.execString)
+                if (appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop' || appId === 'net.lutris.davinci-resolve-studio-1.desktop') {
+                    console.log(`PinnedApps: isRunning changed for "${appId}": ${isRunning}`)
                 }
             }
             
             Component.onCompleted: {
+                const appId = typeof modelData === 'string' ? modelData : (modelData.class || modelData.id || modelData.execString)
+                console.log(`PinnedApps: ALL Component completed for "${appId}"`)
+                if (appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
+                    console.log(`PinnedApps: Component completed for "${appId}"`)
+                    console.log(`PinnedApps: hyprlandManager available: ${hyprlandManager !== null}`)
+                    if (hyprlandManager) {
+                        console.log(`PinnedApps: Current running apps:`, hyprlandManager.runningApps)
+                        console.log(`PinnedApps: isAppRunning result:`, hyprlandManager.isAppRunning(appId))
+                    }
+                }
+                if (appId === 'AffinityDesigner.desktop') {
+                    console.log(`PinnedApps: AffinityDesigner.desktop component created!`)
+                    console.log(`PinnedApps: isRunning binding should be evaluated for "${appId}"`)
+                }
+            }
+
+            onAppClicked: {
+                if (hyprlandManager) {
+                    const appId = typeof modelData === 'string' ? modelData : (modelData.class || modelData.id || modelData.execString)
+                    const isRunning = hyprlandManager.isAppRunning(appId)
+                    hyprlandManager.handleAppClick(appId, isRunning)
+                }
             }
         }
     }
