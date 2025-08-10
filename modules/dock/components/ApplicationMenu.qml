@@ -324,10 +324,10 @@ PanelWindow {
                         width: 36
                         height: 36
                         radius: 30
-                        color: idleArea.containsMouse ? "#444444" : "transparent"
-                        border.color: isInhibiting ? "#00ffff" : (idleArea.containsMouse ? "#555555" : "transparent")
-                        border.width: isInhibiting ? 2 : (idleArea.containsMouse ? 1 : 0)
                         property bool isInhibiting: false
+                        color: idleArea.containsMouse ? "#444444" : "transparent"
+                        border.color: idleInhibitorButton.isInhibiting ? "#00ffff" : (idleArea.containsMouse ? "#555555" : "transparent")
+                        border.width: idleInhibitorButton.isInhibiting ? 2 : (idleArea.containsMouse ? 1 : 0)
                         
                         // Active indicator background for when inhibiting
                         Rectangle {
@@ -401,7 +401,7 @@ PanelWindow {
                         
                         Component.onCompleted: {
                             // On startup, disable sleep by default (kill hypridle)
-                            console.log("IdleInhibitor: Component completed, disabling sleep by default")
+                            // console.log("IdleInhibitor: Component completed, disabling sleep by default")
                             killHypridle.startDetached()
                             idleInhibitorButton.isInhibiting = true
                             // Delay the status check to allow the kill command to take effect
@@ -502,13 +502,13 @@ PanelWindow {
                             anchors.fill: parent
                             hoverEnabled: true
                             onClicked: {
-                                console.log("NightLight: Button clicked, current state:", nightLightButton.enabled)
+                                // console.log("NightLight: Button clicked, current state:", nightLightButton.enabled)
                                 nightLightButton.enabled = !nightLightButton.enabled
                                 if (enabled) {
-                                    console.log("NightLight: Enabling night light")
+                                    // console.log("NightLight: Enabling night light")
                                     nightLightOn.startDetached()
                                 } else {
-                                    console.log("NightLight: Disabling night light")
+                                    // console.log("NightLight: Disabling night light")
                                     nightLightOff.startDetached()
                                 }
                             }
@@ -552,7 +552,7 @@ PanelWindow {
                             id: nightLightOn
                             command: ["gammastep"]
                             onStarted: {
-                                console.log("NightLight: gammastep process started")
+                                // console.log("NightLight: gammastep process started")
                             }
                         }
                         
@@ -561,7 +561,7 @@ PanelWindow {
                             id: nightLightOff
                             command: ["pkill", "gammastep"]
                             onStarted: {
-                                console.log("NightLight: pkill gammastep process started")
+                                // console.log("NightLight: pkill gammastep process started")
                             }
                         }
                         
@@ -576,7 +576,7 @@ PanelWindow {
                                     var wasEnabled = nightLightButton.enabled
                                     nightLightButton.enabled = data.length > 0
                                     if (wasEnabled !== nightLightButton.enabled) {
-                                        console.log("NightLight: State updated, enabled:", nightLightButton.enabled)
+                                        // console.log("NightLight: State updated, enabled:", nightLightButton.enabled)
                                     }
                                 }
                             }

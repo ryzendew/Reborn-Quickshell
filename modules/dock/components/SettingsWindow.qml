@@ -29,7 +29,7 @@ PanelWindow {
     }
     
     implicitWidth: 1920
-    implicitHeight: 1080
+    implicitHeight: 1440
     
     // Make the panel window transparent
     color: "transparent"
@@ -158,12 +158,43 @@ PanelWindow {
             anchors.centerIn: parent
             width: parent.width * 0.9
             height: parent.height * 0.9
-            color: "#1a1a1a"
-            opacity: 0.95
+            color: "transparent"
             radius: 20
             border.color: "#5700eeff"
             border.width: 1
             focus: true
+            
+            // macOS Tahoe-style transparency effect
+            Rectangle {
+                anchors.fill: parent
+                color: "#1a1a1a"
+                opacity: 0.8
+                radius: 20
+            }
+            
+            // Dark mode backdrop
+            Rectangle {
+                anchors.fill: parent
+                color: "#0a0a0a"
+                opacity: 0.3
+                radius: 20
+            }
+            
+            // Semi-transparent white border overlay
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                radius: 20
+                border.color: "#40ffffff"
+                border.width: 1
+            }
+            
+            // Semi-transparent white overlay for macOS-like shine
+            Rectangle {
+                anchors.fill: parent
+                color: "#15ffffff"
+                radius: 20
+            }
             
             // Scale and opacity animations
             scale: settingsWindow.windowScale
@@ -267,10 +298,42 @@ PanelWindow {
                 id: sidebar
                 Layout.preferredWidth: 240
                 Layout.fillHeight: true
-                color: "#2a2a2a"
+                color: "transparent"
                 radius: 12
                 border.color: "#33ffffff"
                 border.width: 1
+                
+                // macOS Tahoe-style transparency effect
+                Rectangle {
+                    anchors.fill: parent
+                    color: "#2a2a2a"
+                    opacity: 0.8
+                    radius: 12
+                }
+                
+                // Dark mode backdrop
+                Rectangle {
+                    anchors.fill: parent
+                    color: "#1a1a1a"
+                    opacity: 0.3
+                    radius: 12
+                }
+                
+                // Semi-transparent white border overlay
+                Rectangle {
+                    anchors.fill: parent
+                    color: "transparent"
+                    radius: 12
+                    border.color: "#40ffffff"
+                    border.width: 1
+                }
+                
+                // Semi-transparent white overlay for macOS-like shine
+                Rectangle {
+                    anchors.fill: parent
+                    color: "#15ffffff"
+                    radius: 12
+                }
                 
                 // Sidebar animation
                 property real slideOffset: 0
@@ -305,10 +368,42 @@ PanelWindow {
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 36
-                        color: "#333333"
+                        color: "transparent"
                         radius: 8
                         border.color: "#44ffffff"
                         border.width: 1
+                        
+                        // macOS Tahoe-style transparency effect
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "#333333"
+                            opacity: 0.8
+                            radius: 8
+                        }
+                        
+                        // Dark mode backdrop
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "#1a1a1a"
+                            opacity: 0.3
+                            radius: 8
+                        }
+                        
+                        // Semi-transparent white border overlay
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "transparent"
+                            radius: 8
+                            border.color: "#40ffffff"
+                            border.width: 1
+                        }
+                        
+                        // Semi-transparent white overlay for macOS-like shine
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "#15ffffff"
+                            radius: 8
+                        }
                         
                         RowLayout {
                             anchors.fill: parent
@@ -337,10 +432,42 @@ PanelWindow {
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 90
-                        color: "#333333"
+                        color: "transparent"
                         radius: 8
                         border.color: "#44ffffff"
                         border.width: 1
+                        
+                        // macOS Tahoe-style transparency effect
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "#333333"
+                            opacity: 0.8
+                            radius: 8
+                        }
+                        
+                        // Dark mode backdrop
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "#1a1a1a"
+                            opacity: 0.3
+                            radius: 8
+                        }
+                        
+                        // Semi-transparent white border overlay
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "transparent"
+                            radius: 8
+                            border.color: "#40ffffff"
+                            border.width: 1
+                        }
+                        
+                        // Semi-transparent white overlay for macOS-like shine
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "#15ffffff"
+                            radius: 8
+                        }
                         
                         RowLayout {
                             anchors.fill: parent
@@ -394,7 +521,7 @@ PanelWindow {
                         
                         ColumnLayout {
                             width: parent.width
-                            spacing: 24
+                            spacing: 16
                             
                             // Settings categories
                             Repeater {
@@ -403,15 +530,13 @@ PanelWindow {
                                     {icon: "bluetooth", text: "Bluetooth", selected: false},
                                     {icon: "language", text: "Network", selected: false},
                                     {icon: "battery_full", text: "Power", selected: false},
-                                    {icon: "settings", text: "General", selected: true},
-                                    {icon: "accessibility", text: "Accessibility", selected: false},
+                                    {icon: "settings", text: "Calendar", selected: true},
                                     {icon: "palette", text: "Appearance", selected: false},
                                     {icon: "desktop_windows", text: "Desktop & Dock", selected: false},
-                                    {icon: "monitor", text: "Displays", selected: false},
                                     {icon: "wallpaper", text: "Wallpaper", selected: false},
                                     {icon: "notifications", text: "Notifications", selected: false},
                                     {icon: "volume_up", text: "Sound", selected: false},
-                                    {icon: "schedule", text: "Screen Time", selected: false},
+                                    {icon: "wb_sunny", text: "Weather", selected: false},
                                     {icon: "computer", text: "System", selected: false}
                                 ]
                                 
@@ -502,10 +627,42 @@ PanelWindow {
                 id: contentArea
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: "#1a1a1a"
+                color: "transparent"
                 radius: 12
                 border.color: "#33ffffff"
                 border.width: 1
+                
+                // macOS Tahoe-style transparency effect
+                Rectangle {
+                    anchors.fill: parent
+                    color: "#1a1a1a"
+                    opacity: 0.6
+                    radius: 12
+                }
+                
+                // Dark mode backdrop
+                Rectangle {
+                    anchors.fill: parent
+                    color: "#0a0a0a"
+                    opacity: 0.3
+                    radius: 12
+                }
+                
+                // Semi-transparent white border overlay
+                Rectangle {
+                    anchors.fill: parent
+                    color: "transparent"
+                    radius: 12
+                    border.color: "#40ffffff"
+                    border.width: 1
+                }
+                
+                // Semi-transparent white overlay for macOS-like shine
+                Rectangle {
+                    anchors.fill: parent
+                    color: "#15ffffff"
+                    radius: 12
+                }
                 
                 // Content area animation
                 property real slideOffset: 0
@@ -542,11 +699,14 @@ PanelWindow {
                             case 1: return "settings/BluetoothTab.qml" // Bluetooth tab
                             case 2: return "settings/NetworkTab.qml" // Network will use NetworkTab
                             case 3: return "settings/PowerTab.qml" // Power tab
-                            case 4: return "settings/GeneralTab.qml"
-                            case 7: return "settings/DesktopDockTab.qml" // Desktop & Dock tab
-                            case 9: return "settings/WallpaperTab.qml" // Wallpaper tab
-                            case 11: return "settings/SoundTab.qml" // Sound tab (index 11)
-                            case 13: return "settings/SystemTab.qml" // System tab (index 13)
+                            case 4: return "settings/CalendarTab.qml" // Calendar tab
+                            case 5: return "settings/GeneralTab.qml" // Appearance tab
+                            case 6: return "settings/DesktopDockTab.qml" // Desktop & Dock tab
+                            case 7: return "settings/WallpaperTab.qml" // Wallpaper tab
+                            case 8: return "settings/GeneralTab.qml" // Notifications tab
+                            case 9: return "settings/SoundTab.qml" // Sound tab
+                            case 10: return "settings/WeatherTab.qml" // Weather tab
+                            case 11: return "settings/SystemTab.qml" // System tab
                             default: return "settings/GeneralTab.qml"
                         }
                     }

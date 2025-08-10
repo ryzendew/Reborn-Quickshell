@@ -56,18 +56,9 @@ Row {
             
             property bool isHovered: trayMouseArea.containsMouse
             
-            // Hover scale animation
-            scale: isHovered ? 1.15 : 1.0
+            // Hover magnification animation
+            scale: isHovered ? 1.1 : 1.0
             Behavior on scale {
-                NumberAnimation {
-                    duration: 150
-                    easing.type: Easing.OutCubic
-                }
-            }
-            
-            // Subtle rotation on hover
-            rotation: isHovered ? 5 : 0
-            Behavior on rotation {
                 NumberAnimation {
                     duration: 200
                     easing.type: Easing.OutCubic

@@ -10,20 +10,17 @@ Rectangle {
     
     width: Settings.settings.barLogoSize || 24
     height: Settings.settings.barLogoSize || 24
-    radius: 6
+    radius: (Settings.settings.barLogoSize || 24) / 2
     color: archMouseArea.containsMouse ? "#333333" : "transparent"
     border.color: archMouseArea.containsMouse ? "#555555" : "transparent"
     border.width: archMouseArea.containsMouse ? 1 : 0
     
-    // Power panel visibility
-    property bool powerPanelVisible: false
-    
     // Dynamic logo from LogoService
     Image {
-        id: logoImage
+        id: dockLogoImage
         anchors.centerIn: parent
-        width: Settings.settings.barLogoSize || 24
-        height: Settings.settings.barLogoSize || 24
+        width: (Settings.settings.barLogoSize || 24)
+        height: (Settings.settings.barLogoSize || 24)
         source: LogoService.getLogoPath(LogoService.currentBarLogo)
         fillMode: Image.PreserveAspectFit
         smooth: false
@@ -32,48 +29,55 @@ Rectangle {
         sourceSize.width: 64
         sourceSize.height: 64
         
-        // Fallback to a generic icon if logo not found
+        // Fallback to a generic system icon if logo not found
         onStatusChanged: {
             if (status === Image.Error) {
-                source = "image://icon/system-linux"
+                source = IconService ? IconService.getIconPath("system-linux") : "image://icon/system-linux"
             }
         }
     }
     
     // Dynamic color overlay for the logo
     ColorOverlay {
-        anchors.fill: logoImage
-        source: logoImage
+        anchors.fill: dockLogoImage
+        source: dockLogoImage
         color: LogoService.logoColor
     }
     
-    // Mouse area for interactions
     MouseArea {
         id: archMouseArea
         anchors.fill: parent
         hoverEnabled: true
+        onEntered: {
+            archButton.isHovered = true
+        }
+        onExited: {
+            archButton.isHovered = false
+        }
         onClicked: {
-            console.log("ArchButton clicked! powerPanelVisible was:", powerPanelVisible)
-            powerPanelVisible = !powerPanelVisible
-            console.log("ArchButton clicked! powerPanelVisible is now:", powerPanelVisible)
+            // Open power settings tab
+            SettingsManager.openSettingsTab(3)  // Power tab index
         }
     }
     
-    // Power Profile Panel
-    PowerProfilePanel {
-        id: powerPanel
-        visible: powerPanelVisible
-        
-        // Close panel when it becomes invisible
-        onVisibleChanged: {
-            console.log("PowerProfilePanel visibility changed to:", visible)
-            if (!visible) {
-                powerPanelVisible = false
-            }
+    // Smooth scale animation like other dock icons
+    property bool isHovered: false
+    
+    onIsHoveredChanged: {
+        if (isHovered) {
+            scale = 1.1
+        } else {
+            scale = 1.0
         }
     }
     
-    // Smooth animations like dock buttons
+    Behavior on scale {
+        NumberAnimation {
+            duration: 150
+            easing.type: Easing.OutQuad
+        }
+    }
+    
     Behavior on color {
         ColorAnimation {
             duration: 150

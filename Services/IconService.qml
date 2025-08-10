@@ -20,7 +20,7 @@ QtObject {
         if (!appId || appId === "") {
             // Debug logging for final result
         if (appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
-            console.log(`IconService: Final result for "${appId}": image://icon/application-x-executable`)
+            // console.log(`IconService: Final result for "${appId}": image://icon/application-x-executable`)
         }
         
         return "image://icon/application-x-executable"
@@ -49,7 +49,7 @@ QtObject {
         
         // Debug logging for Affinity apps
         if (appId === 'photo.exe' || appId === 'designer.exe' || appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
-            console.log(`IconService: Getting icon for "${appId}"`)
+            // console.log(`IconService: Getting icon for "${appId}"`)
         }
         
 
@@ -217,7 +217,7 @@ QtObject {
             
             // Debug logging for Affinity desktop entries
             if (appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
-                console.log(`IconService: Processing desktop entry "${appId}" -> "${desktopEntryName}"`)
+                // console.log(`IconService: Processing desktop entry "${appId}" -> "${desktopEntryName}"`)
             }
             
             // Map common desktop entry names to their full names
@@ -232,7 +232,7 @@ QtObject {
             
             const mappedName = desktopEntryMap[desktopEntryName.toLowerCase()]
             if (mappedName) {
-                console.log(`IconService: Mapped "${desktopEntryName}" to "${mappedName}"`)
+                // console.log(`IconService: Mapped "${desktopEntryName}" to "${mappedName}"`)
                 
                 // Try to find the desktop entry by name
                 if (typeof DesktopEntries !== 'undefined' && DesktopEntries.applications) {
@@ -243,7 +243,7 @@ QtObject {
                             if (app.icon) {
                                 const iconPath = Quickshell.iconPath(app.icon, true)
                                 if (iconPath && iconPath.length > 0) {
-                                    console.log(`IconService: Found desktop entry icon: ${iconPath}`)
+                                    // console.log(`IconService: Found desktop entry icon: ${iconPath}`)
                                     return iconPath
                                 }
                             }
@@ -266,13 +266,13 @@ QtObject {
                     // Check if the icon file exists using Quickshell.iconPath
                     const iconPath = Quickshell.iconPath(directIcon, true)
                     if (iconPath && iconPath.length > 0 && iconPath !== "image://icon/application-x-executable") {
-                        console.log(`IconService: Using direct icon path: ${iconPath}`)
+                        // console.log(`IconService: Using direct icon path: ${iconPath}`)
                         return iconPath
                     } else {
-                        console.log(`IconService: Direct icon path not found: ${directIcon}`)
+                        // console.log(`IconService: Direct icon path not found: ${directIcon}`)
                         // Try the direct path as a fallback
                         if (directIcon.startsWith('/') && directIcon.endsWith('.svg')) {
-                            console.log(`IconService: Using direct SVG path: ${directIcon}`)
+                            // console.log(`IconService: Using direct SVG path: ${directIcon}`)
                             return directIcon
                         }
                     }
@@ -281,7 +281,7 @@ QtObject {
         } catch (e) {
             // Ignore errors in desktop entry mapping
             if (appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
-                console.log(`IconService: Error in desktop entry mapping:`, e)
+                // console.log(`IconService: Error in desktop entry mapping:`, e)
             }
         }
         

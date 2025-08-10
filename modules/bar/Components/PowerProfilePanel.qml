@@ -45,6 +45,16 @@ PanelWindow {
         border.color: "#333333"
         border.width: 1
         
+        // Hover effects - simple magnification
+        property bool isHovered: false
+        scale: isHovered ? 1.1 : 1.0
+        Behavior on scale {
+            NumberAnimation {
+                duration: 200
+                easing.type: Easing.OutCubic
+            }
+        }
+        
         // Ensure this rectangle is detected for blur
         layer.enabled: true
         layer.smooth: true

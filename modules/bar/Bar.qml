@@ -13,8 +13,8 @@ import "./Components"
 PanelWindow {
     id: panel
     
-    // Set the specific screen (DP-1)
-    screen: Quickshell.screens.find(screen => screen.name === "DP-1")
+    // Set the specific screen (use focused monitor or fallback to first available)
+    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) || Quickshell.screens[0]
     
     // Set layer name for Hyprland blur effects
     WlrLayershell.namespace: "quickshell:bar:blur"
@@ -78,14 +78,24 @@ PanelWindow {
             id: trayMenu
         }
         
-        // System tray widget positioned to the left of time
+        // Weather bar positioned to the left of time
+        WeatherBar {
+            id: weatherBar
+            anchors {
+                right: timeDisplay.left
+                verticalCenter: parent.verticalCenter
+                rightMargin: 16
+            }
+        }
+
+        // System tray widget positioned to the left of weather
         SystemTray {
             id: systemTrayWidget
             bar: panel  // Pass the panel window reference
             shell: panel  // Pass the panel as shell reference
             trayMenu: trayMenu  // Pass the tray menu reference
             anchors {
-                right: timeDisplay.left
+                right: weatherBar.left
                 verticalCenter: parent.verticalCenter
                 rightMargin: 16
             }

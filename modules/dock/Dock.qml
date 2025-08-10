@@ -10,8 +10,8 @@ import qs.Settings
 PanelWindow {
     id: dock
     
-    // Set the specific screen (DP-1)
-    screen: Quickshell.screens.find(screen => screen.name === "DP-1")
+    // Set the specific screen (use focused monitor or fallback to first available)
+    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) || Quickshell.screens[0]
     
     // Set layer name for Hyprland blur effects
     WlrLayershell.namespace: "quickshell:dock:blur"
@@ -56,6 +56,16 @@ PanelWindow {
     SettingsWindow {
         id: settingsWindow
         visible: false
+    }
+    
+    // Connect to SettingsManager to handle tab opening requests
+    Connections {
+        target: SettingsManager
+        
+        function onOpenSettingsTab(tabIndex) {
+            settingsWindow.visible = true
+            settingsWindow.currentTab = tabIndex
+        }
     }
     
     // Make the panel window transparent

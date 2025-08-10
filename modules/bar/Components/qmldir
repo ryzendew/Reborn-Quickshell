@@ -4,4 +4,5 @@ BottomBorder 1.0 BottomBorder.qml
 SystemTray 1.0 SystemTray.qml
 Volume 1.0 Volume.qml
 CustomTrayMenu 1.0 CustomTrayMenu.qml
-PowerProfilePanel 1.0 PowerProfilePanel.qml 
+PowerProfilePanel 1.0 PowerProfilePanel.qml
+WeatherBar 1.0 WeatherBar.qml 

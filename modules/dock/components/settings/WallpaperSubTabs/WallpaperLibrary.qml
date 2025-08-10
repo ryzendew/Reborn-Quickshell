@@ -18,115 +18,12 @@ Rectangle {
             width: parent.width
             spacing: 20
             
-            // Folder Selection
-            Rectangle {
-                Layout.fillWidth: true
-                height: 120
-                color: "#1a1a1a"
-                radius: 12
-                border.color: "#33ffffff"
-                border.width: 1
-                
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 20
-                    spacing: 12
-                    
-                    Label {
-                        text: "Wallpaper Folder"
-                        font.pixelSize: 18
-                        font.weight: Font.Medium
-                        color: "white"
-                    }
-                    
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: 12
-                        
-                        TextField {
-                            id: folderPathField
-                            Layout.fillWidth: true
-                            text: Settings.settings.wallpaperFolder || Quickshell.env("HOME") + "/.config/quickshell/Wallpaper"
-                            placeholderText: "Wallpaper folder path"
-                            color: "white"
-                            background: Rectangle {
-                                color: "#0a0a0a"
-                                radius: 6
-                                border.color: "#404040"
-                                border.width: 1
-                            }
-                            onTextChanged: {
-                                if (text !== Settings.settings.wallpaperFolder) {
-                                    Settings.settings.wallpaperFolder = text
-                                }
-                            }
-                        }
-                        
-                        Button {
-                            text: "Browse"
-                            background: Rectangle {
-                                color: parent.pressed ? "#404040" : "#505050"
-                                radius: 6
-                            }
-                            contentItem: Text {
-                                text: parent.text
-                                color: "white"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                            }
-                            onClicked: folderDialog.open()
-                        }
-                        
-                        Button {
-                            text: "Scan"
-                            background: Rectangle {
-                                color: parent.pressed ? "#404040" : "#505050"
-                                radius: 6
-                            }
-                            contentItem: Text {
-                                text: parent.text
-                                color: "white"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                            }
-                            onClicked: {
-                                Wallpaper.loadWallpapers()
-                            }
-                        }
-                    }
-                    
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: 16
-                        
-                        Label {
-                            text: "Found wallpapers:"
-                            color: "#b0b0b0"
-                            font.pixelSize: 14
-                        }
-                        
-                        Label {
-                            text: Wallpaper.scanning ? "Scanning..." : Wallpaper.wallpaperList.length + " images"
-                            color: Wallpaper.scanning ? "#ffaa00" : "#90ee90"
-                            font.pixelSize: 14
-                        }
-                        
-                        Item { Layout.fillWidth: true }
-                        
-                        BusyIndicator {
-                            running: Wallpaper.scanning
-                            visible: running
-                            Layout.preferredWidth: 16
-                            Layout.preferredHeight: 16
-                        }
-                    }
-                }
-            }
+
             
             // Wallpaper Grid
             Rectangle {
                 Layout.fillWidth: true
-                height: 600
+                height: 700
                 color: "#1a1a1a"
                 radius: 12
                 border.color: "#33ffffff"
@@ -304,17 +201,7 @@ Rectangle {
         }
     }
     
-    // Folder Dialog
-    FolderDialog {
-        id: folderDialog
-        title: "Select Wallpaper Folder"
-        onAccepted: {
-            var path = selectedFolder.toString().replace("file://", "")
-            folderPathField.text = path
-            Settings.settings.wallpaperFolder = path
-                                    Wallpaper.loadWallpapers()
-        }
-    }
+
     
     // Wallpaper Selection Dialog
     Dialog {

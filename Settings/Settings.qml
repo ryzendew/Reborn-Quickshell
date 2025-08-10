@@ -123,6 +123,16 @@ Singleton {
             property bool reverseDayMonth: false
             property bool use12HourClock: false
             
+            // Calendar settings
+            property string calendarDateFormat: "MM/DD/YYYY"
+            property string calendarTimeFormat: "12-hour"
+            property string calendarWeekStart: "Sunday"
+            property bool calendarShowWeekNumbers: false
+            property bool calendarShowTodayHighlight: true
+            property string calendarTodayColor: "#00eeff"
+            property string calendarSelectedColor: "#5700eeff"
+            property string calendarHolidayColor: "#ff6b6b"
+            
             // User settings
             property string userImage: ""
         }

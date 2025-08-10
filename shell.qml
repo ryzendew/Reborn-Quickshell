@@ -13,6 +13,14 @@ import qs.modules.Notifications
 ShellRoot {
     id: root
 
+    Component.onCompleted: {
+        // Wait a bit for PipeWire to initialize
+        initTimer.start()
+        
+        // Initialize weather service
+        WeatherService.initialize()
+    }
+
     // Global states for UI components
     property var globalStates: QtObject {
         property bool sidebarRightOpen: false
@@ -22,17 +30,49 @@ ShellRoot {
     property int volume: 100
     property bool volumeMuted: false
     
+    // Use the custom Pipewire service that's actually working
+    property var pipewireService: Pipewire
+    
     function updateVolumeProperties() {
         try {
-            // Use the custom PipeWire service instead of native one
-            var newVolume = Math.round(Pipewire.sinkVolume * 100)
-            var newMuted = Pipewire.sinkMuted
-            if (volume !== newVolume || volumeMuted !== newMuted) {
-                volume = newVolume
-                volumeMuted = newMuted
+            // Use the custom PipeWire service that's working
+            if (pipewireService && pipewireService.sinkVolume !== undefined) {
+                var newVolume = Math.round(pipewireService.sinkVolume * 100)
+                var newMuted = pipewireService.sinkMuted
+                if (volume !== newVolume || volumeMuted !== newMuted) {
+                    volume = newVolume
+                    volumeMuted = newMuted
+                }
             }
         } catch (error) {
             console.warn("Error updating volume properties:", error)
+        }
+    }
+    
+    // Method to update volume using the working custom service
+    function updateVolume(newVolume) {
+        try {
+            if (pipewireService && typeof pipewireService.setSinkVolume === 'function') {
+                // Convert percentage to 0-1 range and call the service
+                const volumeNormalized = Math.max(0, Math.min(1, newVolume / 100))
+                pipewireService.setSinkVolume(volumeNormalized)
+                volume = newVolume
+            }
+        } catch (error) {
+            console.warn("Error updating volume:", error)
+        }
+    }
+    
+    // Method to toggle mute (like Noctalia's approach)
+    function toggleMute() {
+        try {
+                    if (pipewireService && typeof pipewireService.setSinkMuted === 'function') {
+            const newMutedState = !volumeMuted
+            pipewireService.setSinkMuted(newMutedState)
+            volumeMuted = newMutedState
+        }
+        } catch (error) {
+            console.warn("Error toggling mute:", error)
         }
     }
     
@@ -46,9 +86,9 @@ ShellRoot {
         }
     }
     
-    // Connections to PipeWire service for real-time updates
+    // Connections to custom PipeWire service for real-time updates
     Connections {
-        target: Pipewire
+        target: pipewireService
         
         function onSinkVolumeChanged() {
             updateVolumeProperties()
@@ -60,12 +100,12 @@ ShellRoot {
     }
     
     // Initialize volume properties
-    Component.onCompleted: {
-        // Shell component log disabled for quiet operation
+    // Component.onCompleted: {
+    //     // Shell component log disabled for quiet operation
         
-        // Wait a bit for PipeWire to initialize
-        initTimer.start()
-    }
+    //     // Wait a bit for PipeWire to initialize
+    //     initTimer.start()
+    // }
     
     // Timer for delayed initialization
     Timer {
@@ -78,6 +118,8 @@ ShellRoot {
             updateVolumeProperties()
         }
     }
+
+
 
     // Top bar
     Loader {

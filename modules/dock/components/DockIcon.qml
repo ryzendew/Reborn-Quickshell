@@ -20,13 +20,13 @@ Rectangle {
             // Function to get icon path using the robust IconService with fuzzy search fallback
         function getIconPath(appId) {
             if (appId === 'cursor' || appId === 'equibop' || appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
-                console.log(`DockIcon: Getting icon for "${appId}"`)
+                // console.log(`DockIcon: Getting icon for "${appId}"`)
             }
             
             // First try the comprehensive IconService
             const iconPath = IconService.getIconPath(appId)
             if (appId === 'cursor' || appId === 'equibop' || appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
-                console.log(`DockIcon: IconService returned for "${appId}": ${iconPath}`)
+                // console.log(`DockIcon: IconService returned for "${appId}": ${iconPath}`)
             }
             
             if (iconPath && iconPath !== "image://icon/application-x-executable") {
@@ -37,11 +37,11 @@ Rectangle {
             try {
                 if (typeof FuzzySearch !== 'undefined') {
                     if (appId === 'cursor' || appId === 'equibop') {
-                        console.log(`DockIcon: Trying FuzzySearch fallback for "${appId}"`)
+                        // console.log(`DockIcon: Trying FuzzySearch fallback for "${appId}"`)
                     }
                     const fuzzyIcon = FuzzySearch.findBestIcon(appId)
                     if (appId === 'cursor' || appId === 'equibop') {
-                        console.log(`DockIcon: FuzzySearch returned for "${appId}": ${fuzzyIcon}`)
+                        // console.log(`DockIcon: FuzzySearch returned for "${appId}": ${fuzzyIcon}`)
                     }
                     if (fuzzyIcon && fuzzyIcon !== "image://icon/application-x-executable") {
                         return fuzzyIcon
@@ -49,7 +49,7 @@ Rectangle {
                 }
             } catch (e) {
                 if (appId === 'cursor' || appId === 'equibop') {
-                    console.log(`DockIcon: FuzzySearch error for "${appId}":`, e)
+                    // console.log(`DockIcon: FuzzySearch error for "${appId}":`, e)
                 }
             }
             

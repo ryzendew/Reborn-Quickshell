@@ -125,24 +125,24 @@ Row {
             onIsRunningChanged: {
                 const appId = typeof modelData === 'string' ? modelData : (modelData.class || modelData.id || modelData.execString)
                 if (appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop' || appId === 'net.lutris.davinci-resolve-studio-1.desktop') {
-                    console.log(`PinnedApps: isRunning changed for "${appId}": ${isRunning}`)
+                    // console.log(`PinnedApps: isRunning changed for "${appId}": ${isRunning}`)
                 }
             }
             
             Component.onCompleted: {
                 const appId = typeof modelData === 'string' ? modelData : (modelData.class || modelData.id || modelData.execString)
-                console.log(`PinnedApps: ALL Component completed for "${appId}"`)
+                // console.log(`PinnedApps: ALL Component completed for "${appId}"`)
                 if (appId === 'AffinityPhoto.desktop' || appId === 'AffinityDesigner.desktop') {
-                    console.log(`PinnedApps: Component completed for "${appId}"`)
-                    console.log(`PinnedApps: hyprlandManager available: ${hyprlandManager !== null}`)
+                    // console.log(`PinnedApps: Component completed for "${appId}"`)
+                    // console.log(`PinnedApps: hyprlandManager available: ${hyprlandManager !== null}`)
                     if (hyprlandManager) {
-                        console.log(`PinnedApps: Current running apps:`, hyprlandManager.runningApps)
-                        console.log(`PinnedApps: isAppRunning result:`, hyprlandManager.isAppRunning(appId))
+                        // console.log(`PinnedApps: Current running apps:`, hyprlandManager.runningApps)
+                        // console.log(`PinnedApps: isAppRunning result:`, hyprlandManager.isAppRunning(appId))
                     }
                 }
                 if (appId === 'AffinityDesigner.desktop') {
-                    console.log(`PinnedApps: AffinityDesigner.desktop component created!`)
-                    console.log(`PinnedApps: isRunning binding should be evaluated for "${appId}"`)
+                    // console.log(`PinnedApps: AffinityDesigner.desktop component created!`)
+                    // console.log(`PinnedApps: isRunning binding should be evaluated for "${appId}"`)
                 }
             }
 

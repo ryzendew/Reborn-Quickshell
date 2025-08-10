@@ -50,7 +50,7 @@ Singleton {
     // Load settings on startup
     Component.onCompleted: {
         loadSettings()
-        console.log("TimeService: Settings loaded")
+        // console.log("TimeService: Settings loaded")
     }
     
     // Format time based on current settings

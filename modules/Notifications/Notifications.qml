@@ -14,8 +14,8 @@ PanelWindow {
      WlrLayershell.namespace: "quickshell:notificationPanel:blur"
     WlrLayershell.layer: WlrLayer.Overlay
     
-    // Set the specific screen (DP-1)
-    screen: Quickshell.screens.find(screen => screen.name === "DP-1")
+    // Set the specific screen (use focused monitor or fallback to first available)
+    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) || Quickshell.screens[0]
     
     // Position in top left
     anchors {
@@ -113,7 +113,7 @@ PanelWindow {
                     Rectangle {
                         id: iconBackground
                         width: 94
-                        height: 94
+                        implicitHeight: 94
                         radius: 60
                         color: "#333333"
                         border.color: "#555555"
@@ -145,7 +145,7 @@ PanelWindow {
                             layer.effect: OpacityMask {
                                 maskSource: Rectangle {
                                     width: appIcon.width
-                                    height: appIcon.height
+                                    implicitHeight: appIcon.height
                                     radius: width / 2
                                 }
                             }
@@ -325,6 +325,6 @@ PanelWindow {
     }
     
     Component.onCompleted: {
-        console.log("Notifications component loaded successfully")
+        // console.log("Notifications component loaded successfully")
     }
 } 

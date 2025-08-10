@@ -12,4 +12,6 @@ singleton LogoService 1.0 LogoService.qml
 singleton ConfigService 1.0 ConfigService.qml
 singleton SystemInfo 1.0 SystemInfo.qml
 singleton TimeService 1.0 TimeService.qml
-singleton Settings 1.0 ../modules/dock/components/settings/Settings.qml 
+singleton Settings 1.0 ../modules/dock/components/settings/Settings.qml
+singleton WeatherService 1.0 WeatherService.qml
+singleton SettingsManager 1.0 SettingsManager.qml 

@@ -8,29 +8,43 @@ Rectangle {
     id: wifiTab
     color: "transparent"
     
+    // Main background behind everything
+    Rectangle {
+        anchors.fill: parent
+        color: "#00747474"
+        opacity: 0.6
+        radius: 8
+    }
+    
     // WiFi connection properties
     property bool showPasswordDialog: false
     property string selectedNetwork: ""
     property string passwordInput: ""
     property bool isConnecting: false
     
+    // Computed property to get the currently connected WiFi network
+    property var connectedWifiNetwork: {
+        for (const net in Network.networks) {
+            if (Network.networks[net].connected && Network.networks[net].type === "wifi") {
+                return Network.networks[net];
+            }
+        }
+        return null;
+    }
+    
     // Auto-scan timer
     Timer {
         interval: 30000 // 30 seconds
-        running: Network.wifiEnabled
+        running: true
         repeat: true
         onTriggered: {
-            if (Network.wifiEnabled) {
-                Network.scanNetworks();
-            }
+            Network.refreshNetworks();
         }
     }
     
     // Initial scan
     Component.onCompleted: {
-        if (Network.wifiEnabled) {
-            Network.scanNetworks();
-        }
+        Network.refreshNetworks();
     }
     
     ColumnLayout {
@@ -47,7 +61,7 @@ Rectangle {
             // Back button
             Rectangle {
                 width: 32
-                height: 32
+                implicitHeight: 32
                 radius: 16
                 color: backMouseArea.containsMouse ? "#333333" : "transparent"
                 border.color: backMouseArea.containsMouse ? "#555555" : "transparent"
@@ -126,14 +140,30 @@ Rectangle {
             }
         }
         
-        // WiFi toggle section
+        // WiFi status section
         Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: 64
-            color: "#2a2a2a"
+            color: "transparent"
             radius: 8
             border.color: "#33ffffff"
             border.width: 1
+            
+            // macOS Tahoe-style transparency effect
+            Rectangle {
+                anchors.fill: parent
+                color: "#2a2a2a"
+                opacity: 0.6
+                radius: 8
+            }
+            
+            // Dark mode backdrop
+            Rectangle {
+                anchors.fill: parent
+                color: "#1a1a1a"
+                opacity: 0.3
+                radius: 8
+            }
             
             RowLayout {
                 anchors.fill: parent
@@ -144,28 +174,28 @@ Rectangle {
                     spacing: 4
                     
                     Text {
-                        text: "Wi-Fi"
+                        text: "Wi-Fi Status"
                         font.pixelSize: 14
                         font.weight: Font.Medium
                         color: "#ffffff"
                     }
                     
                     Text {
-                        text: Network.wifiEnabled ? "Wi-Fi is on" : "Wi-Fi is off"
+                        text: Network.hasActiveConnection ? "Connected to a network" : "Not connected"
                         font.pixelSize: 11
-                        color: Network.wifiEnabled ? "#00ff00" : "#ff4444"
+                        color: Network.hasActiveConnection ? "#00ff00" : "#ff4444"
                     }
                 }
                 
                 Item { Layout.fillWidth: true }
                 
-                // Toggle switch
+                // Connection indicator
                 Rectangle {
                     width: 36
                     height: 18
                     radius: 9
-                    color: Network.wifiEnabled ? "#4CAF50" : "#555555"
-                    border.color: Network.wifiEnabled ? "#4CAF50" : "#777777"
+                    color: Network.hasActiveConnection ? "#4CAF50" : "#555555"
+                    border.color: Network.hasActiveConnection ? "#4CAF50" : "#777777"
                     border.width: 1
                     
                     Rectangle {
@@ -175,9 +205,9 @@ Rectangle {
                         color: "#ffffff"
                         anchors {
                             verticalCenter: parent.verticalCenter
-                            right: Network.wifiEnabled ? parent.right : parent.left
-                            rightMargin: Network.wifiEnabled ? 2 : undefined
-                            leftMargin: Network.wifiEnabled ? undefined : 2
+                            right: Network.hasActiveConnection ? parent.right : parent.left
+                            rightMargin: Network.hasActiveConnection ? 2 : undefined
+                            leftMargin: Network.hasActiveConnection ? undefined : 2
                         }
                         
                         Behavior on anchors.rightMargin {
@@ -185,13 +215,6 @@ Rectangle {
                         }
                         Behavior on anchors.leftMargin {
                             NumberAnimation { duration: 150; easing.type: Easing.OutQuad }
-                        }
-                    }
-                    
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            Network.toggleWifi();
                         }
                     }
                     
@@ -206,14 +229,123 @@ Rectangle {
             }
         }
         
+        // Currently connected WiFi network display with blue overlay
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 80
+            color: "transparent"
+            radius: 8
+            border.color: "#33ffffff"
+            border.width: 1
+            visible: connectedWifiNetwork !== null
+            
+            // macOS Tahoe-style transparency effect
+            Rectangle {
+                anchors.fill: parent
+                color: "#2a2a2a"
+                opacity: 0.6
+                radius: 8
+            }
+            
+            // Dark mode backdrop
+            Rectangle {
+                anchors.fill: parent
+                color: "#481a1a1a"
+                opacity: 0.3
+                radius: 8
+            }
+            
+            // Blue semi-transparent overlay
+            Rectangle {
+                anchors.fill: parent
+                color: "#330099ff"
+                radius: 8
+            }
+            
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: 16
+                spacing: 16
+                
+                // WiFi icon with signal strength
+                Text {
+                    text: Network.signalIcon(connectedWifiNetwork ? connectedWifiNetwork.signal || 0 : 0)
+                    font.family: "Material Symbols Outlined"
+                    font.pixelSize: 32
+                    color: "#ffffff"
+                    Layout.alignment: Qt.AlignVCenter
+                }
+                
+                // Connected network info
+                ColumnLayout {
+                    spacing: 4
+                    
+                    Text {
+                        text: "Connected to"
+                        font.pixelSize: 12
+                        color: "#cccccc"
+                    }
+                    
+                    Text {
+                        text: connectedWifiNetwork ? connectedWifiNetwork.ssid || "Unknown Network" : ""
+                        font.pixelSize: 18
+                        font.weight: Font.Bold
+                        color: "#ffffff"
+                    }
+                    
+                    Text {
+                        text: connectedWifiNetwork ? (connectedWifiNetwork.security || "Open") + " • " + (connectedWifiNetwork.signal || 0) + "%" : ""
+                        font.pixelSize: 11
+                        color: "#cccccc"
+                    }
+                }
+                
+                Item { Layout.fillWidth: true }
+                
+                // Connection status indicator
+                Rectangle {
+                    width: 16
+                    height: 16
+                    radius: 8
+                    color: "#4CAF50"
+                    border.color: "#ffffff"
+                    border.width: 2
+                    
+                    Rectangle {
+                        width: 8
+                        height: 8
+                        radius: 4
+                        color: "#ffffff"
+                        anchors.centerIn: parent
+                    }
+                }
+            }
+        }
+        
         // Available networks list
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: "#2a2a2a"
+            color: "transparent"
             radius: 8
             border.color: "#33ffffff"
             border.width: 1
+            
+            // macOS Tahoe-style transparency effect
+            Rectangle {
+                anchors.fill: parent
+                color: "#2a2a2a"
+                opacity: 0.6
+                radius: 8
+            }
+            
+            // Dark mode backdrop
+            Rectangle {
+                anchors.fill: parent
+                color: "#1a1a1a"
+                opacity: 0.3
+                radius: 8
+            }
             
             ColumnLayout {
                 anchors.fill: parent
@@ -254,9 +386,8 @@ Rectangle {
                             id: refreshArea
                             anchors.fill: parent
                             hoverEnabled: true
-                            enabled: !Network.isScanning
                             onClicked: {
-                                Network.scanNetworks();
+                                Network.refreshNetworks();
                             }
                         }
                     }
@@ -273,14 +404,14 @@ Rectangle {
                         anchors.fill: parent
                         color: "#1a1a1a"
                         radius: 8
-                        visible: !Network.wifiEnabled || (networksList.count === 0 && !Network.isScanning)
+                        visible: Object.keys(Network.networks).length === 0
                         
                         ColumnLayout {
                             anchors.centerIn: parent
                             spacing: 8
                             
                             Text {
-                                text: Network.isScanning ? "refresh" : "wifi_off"
+                                text: "wifi_off"
                                 font.family: "Material Symbols Outlined"
                                 font.pixelSize: 32
                                 color: "#666666"
@@ -288,14 +419,14 @@ Rectangle {
                             }
                             
                             Text {
-                                text: Network.isScanning ? "Scanning for networks..." : (Network.wifiEnabled ? "No networks found" : "Wi-Fi is turned off")
+                                text: "No networks found"
                                 font.pixelSize: 14
                                 color: "#666666"
                                 Layout.alignment: Qt.AlignHCenter
                             }
                             
                             Text {
-                                text: Network.wifiEnabled ? "Try refreshing" : "Turn on Wi-Fi to see available networks"
+                                text: "Try refreshing to scan for networks"
                                 font.pixelSize: 12
                                 color: "#444444"
                                 Layout.alignment: Qt.AlignHCenter
@@ -308,18 +439,8 @@ Rectangle {
                         width: parent.width
                         height: parent.height
                         spacing: 8
-                        model: Network.networks || []
-                        property int networkCount: Network.networks ? Network.networks.length : 0
-                        visible: Network.wifiEnabled && networksList.count > 0
-                        
-                        // Debug info disabled
-                        Component.onCompleted: {
-                            // WiFi logs disabled
-                        }
-                        
-                        onModelChanged: {
-                            // WiFi logs disabled
-                        }
+                        model: Object.keys(Network.networks).map(key => Network.networks[key])
+                        visible: Object.keys(Network.networks).length > 0
                         
                         delegate: Rectangle {
                             width: networksList ? networksList.width : 400
@@ -336,13 +457,7 @@ Rectangle {
                                 
                                 // Signal strength icon
                                 Text {
-                                    text: {
-                                        const signal = modelData.signal || 0;
-                                        return signal > 80 ? "signal_wifi_4_bar" :
-                                               signal > 60 ? "network_wifi_3_bar" :
-                                               signal > 40 ? "network_wifi_2_bar" :
-                                               signal > 20 ? "network_wifi_1_bar" : "signal_wifi_0_bar";
-                                    }
+                                    text: Network.signalIcon(modelData.signal || 0)
                                     font.family: "Material Symbols Outlined"
                                     font.pixelSize: 24
                                     color: modelData.connected ? "#4CAF50" : "#cccccc"
@@ -384,10 +499,10 @@ Rectangle {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 onClicked: {
-                                    if (!modelData.connected && !Network.isConnecting) {
+                                    if (!modelData.connected && !Network.connectingSsid) {
                                         selectedNetwork = modelData.ssid || "";
-                                        if (modelData.security === "Open") {
-                                            Network.connectToNetwork(modelData.ssid || "");
+                                        if (modelData.security === "--" || !Network.isSecured(modelData.security)) {
+                                            Network.connectNetwork(modelData.ssid || "", modelData.security || "");
                                         } else {
                                             showPasswordDialog = true;
                                         }
@@ -396,6 +511,55 @@ Rectangle {
                             }
                         }
                     }
+                }
+            }
+        }
+        
+        // Connection status display
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 48
+            color: "transparent"
+            radius: 8
+            border.color: "#33ffffff"
+            border.width: 1
+            visible: Network.connectingSsid || Network.connectStatus
+            
+            // macOS Tahoe-style transparency effect
+            Rectangle {
+                anchors.fill: parent
+                color: "#2a2a2a"
+                opacity: 0.6
+                radius: 8
+            }
+            
+            // Dark mode backdrop
+            Rectangle {
+                anchors.fill: parent
+                color: "#1a1a1a"
+                opacity: 0.3
+                radius: 8
+            }
+            
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: 16
+                spacing: 12
+                
+                Text {
+                    text: Network.connectingSsid ? "refresh" : (Network.connectStatus === "success" ? "check_circle" : "error")
+                    font.family: "Material Symbols Outlined"
+                    font.pixelSize: 20
+                    color: Network.connectingSsid ? "#ffaa00" : (Network.connectStatus === "success" ? "#4CAF50" : "#ff4444")
+                }
+                
+                Text {
+                    text: Network.connectingSsid ? "Connecting to " + Network.connectingSsid + "..." : 
+                          (Network.connectStatus === "success" ? "Successfully connected to " + Network.connectStatusSsid : 
+                           "Connection failed: " + Network.connectError)
+                    font.pixelSize: 14
+                    color: "#ffffff"
+                    Layout.fillWidth: true
                 }
             }
         }
@@ -412,10 +576,26 @@ Rectangle {
         height: 220
         
         background: Rectangle {
-            color: "#1a1a1a"
+            color: "transparent"
             radius: 12
             border.color: "#33ffffff"
             border.width: 1
+            
+            // macOS Tahoe-style transparency effect
+            Rectangle {
+                anchors.fill: parent
+                color: "#1a1a1a"
+                opacity: 0.6
+                radius: 12
+            }
+            
+            // Dark mode backdrop
+            Rectangle {
+                anchors.fill: parent
+                color: "#0a0a0a"
+                opacity: 0.3
+                radius: 12
+            }
         }
         
         onVisibleChanged: {
@@ -455,10 +635,26 @@ Rectangle {
                 selectedTextColor: "#ffffff"
                 
                 background: Rectangle {
-                    color: "#2a2a2a"
+                    color: "transparent"
                     radius: 8
                     border.color: "#33ffffff"
                     border.width: 1
+                    
+                    // macOS Tahoe-style transparency effect
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#2a2a2a"
+                        opacity: 0.8
+                        radius: 8
+                    }
+                    
+                    // Dark mode backdrop
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#1a1a1a"
+                        opacity: 0.3
+                        radius: 8
+                    }
                 }
             }
             
@@ -477,10 +673,26 @@ Rectangle {
                     }
                     
                     background: Rectangle {
-                        color: "#2a2a2a"
+                        color: "transparent"
                         radius: 8
                         border.color: "#33ffffff"
                         border.width: 1
+                        
+                        // macOS Tahoe-style transparency effect
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "#2a2a2a"
+                            opacity: 0.6
+                            radius: 8
+                        }
+                        
+                        // Dark mode backdrop
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "#1a1a1a"
+                            opacity: 0.3
+                            radius: 8
+                        }
                     }
                     
                     contentItem: Text {
@@ -497,16 +709,32 @@ Rectangle {
                     text: "Connect"
                     enabled: passwordInput.length > 0
                     onClicked: {
-                        Network.connectToNetwork(selectedNetwork, passwordInput);
+                        Network.submitPassword(selectedNetwork, passwordInput);
                         showPasswordDialog = false;
                         selectedNetwork = "";
                     }
                     
                     background: Rectangle {
-                        color: enabled ? "#5700eeff" : "#2a2a2a"
+                        color: "transparent"
                         radius: 8
                         border.color: enabled ? "#7700eeff" : "#33ffffff"
                         border.width: 1
+                        
+                        // macOS Tahoe-style transparency effect
+                        Rectangle {
+                            anchors.fill: parent
+                            color: enabled ? "#5700eeff" : "#2a2a2a"
+                            opacity: 0.8
+                            radius: 8
+                        }
+                        
+                        // Dark mode backdrop
+                        Rectangle {
+                            anchors.fill: parent
+                            color: enabled ? "#3300eeff" : "#1a1a1a"
+                            opacity: 0.3
+                            radius: 8
+                        }
                     }
                     
                     contentItem: Text {

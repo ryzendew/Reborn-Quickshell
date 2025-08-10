@@ -9,6 +9,14 @@ Rectangle {
     id: powerTab
     color: "transparent"
     
+    // Main background behind everything
+    Rectangle {
+        anchors.fill: parent
+        color: "#00747474"
+        opacity: 0.8
+        radius: 8
+    }
+    
     property bool showAdvancedSettings: false
     
     // UPower properties
@@ -217,10 +225,42 @@ Rectangle {
                     visible: hasBattery
                     Layout.fillWidth: true
                     Layout.preferredHeight: 120
-                    color: "#2a2a2a"
+                    color: "transparent"
                     radius: 12
                     border.color: "#33ffffff"
                     border.width: 1
+                    
+                    // macOS Tahoe-style transparency effect
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#2a2a2a"
+                        opacity: 0.8
+                        radius: 12
+                    }
+                    
+                    // Dark mode backdrop
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#1a1a1a"
+                        opacity: 0.3
+                        radius: 12
+                    }
+                    
+                    // Semi-transparent white border overlay
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "transparent"
+                        radius: 12
+                        border.color: "#40ffffff"
+                        border.width: 1
+                    }
+                    
+                    // Semi-transparent white overlay for macOS-like shine
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#15ffffff"
+                        radius: 12
+                    }
                     
                     RowLayout {
                         anchors.fill: parent
@@ -295,9 +335,41 @@ Rectangle {
                     visible: !hasBattery
                     Layout.fillWidth: true
                     Layout.preferredHeight: 80
-                    color: "#2a2a2a"
+                    color: "transparent"
                     radius: 12
                     border.color: "#33ffffff"
+                    
+                    // macOS Tahoe-style transparency effect
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#2a2a2a"
+                        opacity: 0.8
+                        radius: 12
+                    }
+                    
+                    // Dark mode backdrop
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#1a1a1a"
+                        opacity: 0.3
+                        radius: 12
+                    }
+                    
+                    // Semi-transparent white border overlay
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "transparent"
+                        radius: 12
+                        border.color: "#40ffffff"
+                        border.width: 1
+                    }
+                    
+                    // Semi-transparent white overlay for macOS-like shine
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#15ffffff"
+                        radius: 12
+                    }
                     border.width: 1
                     
                     RowLayout {

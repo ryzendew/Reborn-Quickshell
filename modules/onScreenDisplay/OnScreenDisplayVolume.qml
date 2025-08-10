@@ -16,7 +16,7 @@ Scope {
     property var focusedScreen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name)
     
     Component.onCompleted: {
-        console.log("Volume OSD component loaded!")
+        // console.log("Volume OSD component loaded!")
     }
     
     function triggerOsd() {

@@ -8,6 +8,16 @@ Item {
     property int volume: 0
     property bool volumeMuted: false
     
+    // Hover effects - simple magnification
+    property bool isHovered: false
+    scale: isHovered ? 1.1 : 1.0
+    Behavior on scale {
+        NumberAnimation {
+            duration: 200
+            easing.type: Easing.OutCubic
+        }
+    }
+    
     // Update volume display when properties change
     onVolumeChanged: {
         console.log("Volume widget - Volume changed to:", volume)
@@ -126,6 +136,15 @@ Item {
         MouseArea {
             anchors.fill: iconCircle
             acceptedButtons: Qt.LeftButton | Qt.RightButton
+            hoverEnabled: true
+            
+            onEntered: {
+                volumeDisplay.isHovered = true
+            }
+            
+            onExited: {
+                volumeDisplay.isHovered = false
+            }
             
             onClicked: function(mouse) {
                 if (mouse.button === Qt.LeftButton) {

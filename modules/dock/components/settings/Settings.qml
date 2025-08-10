@@ -6,7 +6,7 @@ import Quickshell.Io
 Singleton {
     property string shellName: "Quickshell"
     property string settingsDir: Quickshell.env("QUICKSHELL_SETTINGS_DIR") || (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/" + shellName + "/"
-    property string settingsFile: Quickshell.env("QUICKSHELL_SETTINGS_FILE") || (settingsDir + "Settings.json")
+    property string settingsFile: Quickshell.env("QUICKSHELL_SETTINGS_FILE") || (Quickshell.env("HOME") + "/.local/state/Quickshell/Settings.conf")
     property string themeFile: Quickshell.env("QUICKSHELL_THEME_FILE") || (settingsDir + "Theme.json")
     property var settings: settingAdapter
 
@@ -16,14 +16,14 @@ Singleton {
             Quickshell.execDetached(["mkdir", "-p", settingsDir]);
             
             // Log current settings for debugging
-            console.log("Dock settings loaded:");
-            console.log("showDock:", settings.showDock);
-            console.log("dockIconSize:", settings.dockIconSize);
-            console.log("dockHeight:", settings.dockHeight);
-            console.log("dockIconSpacing:", settings.dockIconSpacing);
-            console.log("dockBorderWidth:", settings.dockBorderWidth);
-            console.log("dockBorderColor:", settings.dockBorderColor);
-            console.log("dockActiveIndicatorColor:", settings.dockActiveIndicatorColor);
+            // console.log("Dock settings loaded:");
+            // console.log("showDock:", settings.showDock);
+            // console.log("dockIconSize:", settings.dockIconSize);
+            // console.log("dockHeight:", settings.dockHeight);
+            // console.log("dockIconSpacing:", settings.dockIconSpacing);
+            // console.log("dockBorderWidth:", settings.dockBorderWidth);
+            // console.log("dockBorderColor:", settings.dockBorderColor);
+            // console.log("dockActiveIndicatorColor:", settings.dockActiveIndicatorColor);
         }
     }
 
@@ -97,6 +97,11 @@ Singleton {
             // Weather settings
             property string weatherCity: "Dinslaken"
             property bool useFahrenheit: false
+            property bool weatherAutoLocation: true
+            property real weatherLatitude: 51.5683
+            property real weatherLongitude: 6.7303
+            property string weatherCountry: "Germany"
+            property string weatherRegion: "North Rhine-Westphalia"
             
             // User profile
             property string profileImage: Quickshell.env("HOME") + "/.face"
