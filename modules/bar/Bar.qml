@@ -13,8 +13,8 @@ import "./Components"
 PanelWindow {
     id: panel
     
-    // Set the specific screen (use focused monitor or fallback to first available)
-    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) || Quickshell.screens[0]
+    // Set the specific screen to DP-1 only
+    screen: Quickshell.screens.find(s => s.name === "DP-1") || Quickshell.screens[0]
     
     // Set layer name for Hyprland blur effects
     WlrLayershell.namespace: "quickshell:bar:blur"
@@ -47,7 +47,7 @@ PanelWindow {
         id: bar
         anchors.fill: parent
         color: "#1a1a1a"  // Dark background
-        opacity: Settings.settings.dimPanels ? 0.8 : 1.0  // Make bar transparent based on dim panels setting
+        opacity: Settings.settings.barDimmed ? 0.8 : 1.0  // Make bar transparent based on bar dimmed setting
         radius: 0  // Full width bar without rounded corners
         border.color: "#333333"
         border.width: 0

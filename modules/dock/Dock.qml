@@ -10,8 +10,8 @@ import qs.Settings
 PanelWindow {
     id: dock
     
-    // Set the specific screen (use focused monitor or fallback to first available)
-    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) || Quickshell.screens[0]
+    // Set the specific screen to DP-1 only
+    screen: Quickshell.screens.find(s => s.name === "DP-1") || Quickshell.screens[0]
     
     // Set layer name for Hyprland blur effects
     WlrLayershell.namespace: "quickshell:dock:blur"
@@ -19,6 +19,8 @@ PanelWindow {
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     
     // Accept context menu from parent (but we'll use our own internal one)
+
+  color: "transparent"
 
     
     // Context menu for dock icons
@@ -69,17 +71,16 @@ PanelWindow {
     }
     
     // Make the panel window transparent
-    color: "transparent"
     
     // Main dock content
     Rectangle {
         id: dockContent
+        color: "#1a1a1a"
         anchors.centerIn: parent
         width: dockIcons.width + 20
         height: Settings.settings.dockHeight || 60
-        color: "#1a1a1a"
-        opacity: 0.8
         radius: Settings.settings.dockRadius || 30
+        opacity: Settings.settings.dockDimmed ? 0.8 : 1.0  // Make dock transparent based on dock dimmed setting
         border.color: Settings.settings.dockBorderColor || "#5700eeff"
         border.width: Settings.settings.dockBorderWidth || 1
         
@@ -89,6 +90,7 @@ PanelWindow {
             anchors.centerIn: parent
             spacing: Settings.settings.dockIconSpacing || 8
             height: Settings.settings.dockIconSize || 48  // Match the height of DockIcon
+            opacity: 1.0
             
             // Pinned apps on the left
             PinnedApps {
@@ -114,6 +116,7 @@ PanelWindow {
                 pinnedApps: pinnedAppsManager.pinnedApps
                 hyprlandManager: hyprlandManager
                 dockWindow: dock
+                opacity: 1.0
             }
             
             // Separator between running apps and settings
@@ -136,7 +139,7 @@ PanelWindow {
                 color: settingsMouseArea.containsMouse ? "#333333" : "transparent"
                 border.color: settingsMouseArea.containsMouse ? "#555555" : "transparent"
                 border.width: settingsMouseArea.containsMouse ? 1 : 0
-                
+                opacity: 1.0
                 // Settings icon using Material Symbols
                 Text {
                     id: settingsIcon
@@ -147,6 +150,7 @@ PanelWindow {
                     color: "#ffffff"
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
+                    opacity: 1.0
                     
                     // Rotation animation
                     property real rotationAngle: 0

@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import qs.Settings
+import qs.Services
 
 Rectangle {
     id: calendarTab
@@ -22,6 +23,15 @@ Rectangle {
     property int currentYear: currentDate.getFullYear()
     property int selectedDay: currentDate.getDate()
     
+    // Holiday properties
+    property var currentMonthHolidays: []
+    property bool holidaysLoaded: false
+    
+    // Initialize holidays
+    Component.onCompleted: {
+        loadHolidaysForMonth()
+    }
+    
     // Calendar navigation
     function nextMonth() {
         if (currentMonth === 11) {
@@ -31,6 +41,7 @@ Rectangle {
             currentMonth++
         }
         selectedDay = 1
+        loadHolidaysForMonth()
     }
     
     function previousMonth() {
@@ -41,6 +52,7 @@ Rectangle {
             currentMonth--
         }
         selectedDay = 1
+        loadHolidaysForMonth()
     }
     
     function goToToday() {
@@ -48,6 +60,7 @@ Rectangle {
         currentMonth = currentDate.getMonth()
         currentYear = currentDate.getFullYear()
         selectedDay = currentDate.getDate()
+        loadHolidaysForMonth()
     }
     
     // Get days in month
@@ -83,8 +96,31 @@ Rectangle {
         }
     }
     
+    // Load holidays for current month
+    function loadHolidaysForMonth() {
+        currentMonthHolidays = HolidayService.getHolidaysForMonth(currentMonth, currentYear)
+        holidaysLoaded = true
+    }
+    
+    // Check if a date has holidays
+    function hasHolidays(day) {
+        if (!holidaysLoaded || day <= 0) return false
+        const date = new Date(currentYear, currentMonth, day)
+        return HolidayService.hasHolidays(date)
+    }
+    
+    // Get holiday names for a date
+    function getHolidayNames(day) {
+        if (!holidaysLoaded || day <= 0) return []
+        const date = new Date(currentYear, currentMonth, day)
+        return HolidayService.getHolidayNames(date)
+    }
+    
     ColumnLayout {
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
         anchors.margins: 12
         spacing: 12
         
@@ -93,7 +129,7 @@ Rectangle {
         // Calendar Navigation and Display
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 795
+            Layout.fillHeight: true
             color: "transparent"
             radius: 12
             border.color: "#33ffffff"
@@ -326,6 +362,24 @@ Rectangle {
                                 }
                             }
                             
+                            // Holiday names in bottom left corner
+                            Text {
+                                anchors.left: parent.left
+                                anchors.leftMargin: 4
+                                anchors.bottom: parent.bottom
+                                anchors.bottomMargin: 4
+                                text: modelData.day > 0 && hasHolidays(modelData.day) ? 
+                                    getHolidayNames(modelData.day).join(", ") : ""
+                                font.pixelSize: 16
+                                color: "#ffffff"
+                                font.weight: Font.Medium
+                                visible: modelData.day > 0 && hasHolidays(modelData.day) && Settings.settings.calendarShowHolidays
+                                wrapMode: Text.WordWrap
+                                width: parent.width - 8
+                            }
+                            
+
+                            
                             MouseArea {
                                 anchors.fill: parent
                                 enabled: modelData.day > 0
@@ -341,6 +395,172 @@ Rectangle {
             }
         }
         
-
+        // Country Selector and Upcoming Holidays
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 200
+            color: "transparent"
+            radius: 12
+            border.color: "#33ffffff"
+            border.width: 1
+            
+            // macOS Tahoe-style transparency effect
+            Rectangle {
+                anchors.fill: parent
+                color: "#2a2a2a"
+                opacity: 0.8
+                radius: 12
+            }
+            
+            // Dark mode backdrop
+            Rectangle {
+                anchors.fill: parent
+                color: "#1a1a1a"
+                opacity: 0.3
+                radius: 12
+            }
+            
+            // Semi-transparent white border overlay
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                radius: 12
+                border.color: "#40ffffff"
+                border.width: 1
+            }
+            
+            // Semi-transparent white overlay for macOS-like shine
+            Rectangle {
+                anchors.fill: parent
+                color: "#15ffffff"
+                radius: 12
+            }
+            
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 20
+                spacing: 16
+                
+                // Country Selector
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 16
+                    
+                    Text {
+                        text: "Country:"
+                        font.pixelSize: 18
+                        font.weight: Font.Medium
+                        color: "#ffffff"
+                    }
+                    
+                    ComboBox {
+                        id: countryComboBox
+                        Layout.preferredWidth: 200
+                        model: HolidayService.availableCountries.map(country => 
+                            country.countryCode + " - " + country.name
+                        )
+                        currentIndex: HolidayService.availableCountries.findIndex(c => c.countryCode === HolidayService.currentCountry)
+                        
+                        onActivated: {
+                            const selectedCountry = HolidayService.availableCountries[index]
+                            HolidayService.loadHolidaysForCountry(selectedCountry.countryCode, currentYear)
+                            Settings.settings.calendarHolidayCountry = selectedCountry.countryCode
+                            loadHolidaysForMonth()
+                        }
+                        
+                        delegate: Text {
+                            text: modelData
+                            font.pixelSize: 16
+                            color: "#ffffff"
+                            padding: 8
+                        }
+                    }
+                    
+                    Text {
+                        text: "Year:"
+                        font.pixelSize: 18
+                        font.weight: Font.Medium
+                        color: "#ffffff"
+                    }
+                    
+                    SpinBox {
+                        id: yearSpinBox
+                        Layout.preferredWidth: 100
+                        from: 2020
+                        to: 2030
+                        value: currentYear
+                        
+                        onValueChanged: {
+                            currentYear = value
+                            HolidayService.loadHolidaysForCountry(HolidayService.currentCountry, currentYear)
+                            loadHolidaysForMonth()
+                        }
+                    }
+                }
+                
+                // Upcoming Holidays
+                Text {
+                    text: "Upcoming Holidays"
+                    font.pixelSize: 20
+                    font.weight: Font.Bold
+                    color: "#ffffff"
+                }
+                
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+                    
+                    ListView {
+                        model: HolidayService.getUpcomingHolidays()
+                        spacing: 8
+                        
+                        delegate: Rectangle {
+                            width: ListView.view.width - 20
+                            height: 50
+                            color: "transparent"
+                            radius: 8
+                            border.color: "#33ffffff"
+                            border.width: 1
+                            
+                            // Holiday background
+                            Rectangle {
+                                anchors.fill: parent
+                                color: "#2a2a2a"
+                                opacity: 0.8
+                                radius: 8
+                            }
+                            
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.margins: 12
+                                spacing: 16
+                                
+                                Text {
+                                    text: HolidayService.getCountryDisplay(HolidayService.currentCountry)
+                                    font.pixelSize: 14
+                                    color: "#74b9ff"
+                                    font.weight: Font.Medium
+                                }
+                                
+                                Text {
+                                    text: modelData.name
+                                    font.pixelSize: 16
+                                    font.weight: Font.Medium
+                                    color: "#ffffff"
+                                    Layout.fillWidth: true
+                                }
+                                
+                                Text {
+                                    text: modelData.date
+                                    font.pixelSize: 14
+                                    color: "#aaaaaa"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 } 

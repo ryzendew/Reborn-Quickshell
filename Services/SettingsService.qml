@@ -72,6 +72,7 @@ Singleton {
     property int barHeight: 40
     property string barColor: "#2a2a2a"
     property real barOpacity: 0.9
+    property bool barDimmed: true  // Bar transparency setting
     property string barPosition: "top" // top, bottom
     property bool barShowWorkspaces: true
     property bool barShowTime: true
@@ -84,6 +85,7 @@ Singleton {
     property int dockHeight: 60
     property string dockColor: "#2a2a2a"
     property real dockOpacity: 0.9
+    property bool dockDimmed: true  // Dock transparency setting
     property string dockPosition: "bottom" // top, bottom, left, right
     property int dockIconSize: 48
     property bool dockShowLabels: true
@@ -167,6 +169,7 @@ Singleton {
             if (settings.barHeight) barHeight = settings.barHeight
             if (settings.barColor) barColor = settings.barColor
             if (settings.barOpacity) barOpacity = settings.barOpacity
+            if (settings.barDimmed !== undefined) barDimmed = settings.barDimmed
             if (settings.barPosition) barPosition = settings.barPosition
             if (settings.barShowWorkspaces !== undefined) barShowWorkspaces = settings.barShowWorkspaces
             if (settings.barShowTime !== undefined) barShowTime = settings.barShowTime
@@ -179,6 +182,7 @@ Singleton {
             if (settings.dockHeight) dockHeight = settings.dockHeight
             if (settings.dockColor) dockColor = settings.dockColor
             if (settings.dockOpacity) dockOpacity = settings.dockOpacity
+            if (settings.dockDimmed !== undefined) dockDimmed = settings.dockDimmed
             if (settings.dockPosition) dockPosition = settings.dockPosition
             if (settings.dockIconSize) dockIconSize = settings.dockIconSize
             if (settings.dockShowLabels !== undefined) dockShowLabels = settings.dockShowLabels
@@ -267,6 +271,7 @@ Singleton {
                 barHeight: barHeight,
                 barColor: barColor,
                 barOpacity: barOpacity,
+                barDimmed: barDimmed,
                 barPosition: barPosition,
                 barShowWorkspaces: barShowWorkspaces,
                 barShowTime: barShowTime,
@@ -279,6 +284,7 @@ Singleton {
                 dockHeight: dockHeight,
                 dockColor: dockColor,
                 dockOpacity: dockOpacity,
+                dockDimmed: dockDimmed,
                 dockPosition: dockPosition,
                 dockIconSize: dockIconSize,
                 dockShowLabels: dockShowLabels,

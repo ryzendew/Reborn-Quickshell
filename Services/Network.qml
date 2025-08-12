@@ -76,32 +76,33 @@ QtObject {
     
     property int refreshInterval: 25000 // Only refresh when we have an active connection
     
-    property bool hasActiveConnection: {
+    // Use explicit properties that get updated when networks change
+    property bool hasActiveConnection: false
+    property bool hasWifiConnection: false
+    property bool hasEthernetConnection: false
+    
+    // Function to update connection status
+    function updateConnectionStatus() {
+        let hasActive = false;
+        let hasWifi = false;
+        let hasEthernet = false;
+        
         for (const net in networks) {
             if (networks[net].connected) {
-                return true;
+                hasActive = true;
+                if (networks[net].type === "wifi") {
+                    hasWifi = true;
+                } else if (networks[net].type === "ethernet") {
+                    hasEthernet = true;
             }
         }
-        return false;
-    }
-    
-    // Connection type detection
-    property bool hasWifiConnection: {
-        for (const net in networks) {
-            if (networks[net].connected && networks[net].type === "wifi") {
-                return true;
-            }
         }
-        return false;
-    }
-    
-    property bool hasEthernetConnection: {
-        for (const net in networks) {
-            if (networks[net].connected && networks[net].type === "ethernet") {
-                return true;
-            }
-        }
-        return false;
+        
+        hasActiveConnection = hasActive;
+        hasWifiConnection = hasWifi;
+        hasEthernetConnection = hasEthernet;
+        
+        console.log("Network service: Updated connection status - Active:", hasActive, "WiFi:", hasWifi, "Ethernet:", hasEthernet);
     }
     
     property string connectionType: {
@@ -165,12 +166,28 @@ QtObject {
                     const state = parts[3];
                     
                     if (ssid && state === "activated") {
+                        // Normalize connection types dynamically
+                        let normalizedType = type;
+                        
+                        // Handle various ethernet connection types
+                        if (type.includes("ethernet") || type.includes("802-3")) {
+                            normalizedType = "ethernet";
+                        }
+                        // Handle various wifi connection types
+                        else if (type.includes("wifi") || type.includes("802-11")) {
+                            normalizedType = "wifi";
+                        }
+                        // Handle other connection types as-is
+                        
                         networksMap[ssid] = {
                             ssid: ssid,
-                            type: type,
+                            type: normalizedType,
                             device: device,
                             connected: true
                         };
+                        
+                        // Debug logging for connection detection
+                        console.log("Network service: Detected connection:", ssid, "Type:", type, "Normalized:", normalizedType);
                     }
                 }
                 
@@ -246,6 +263,9 @@ QtObject {
                 
                 root.networks = networksMap;
                 scanProcess.existingNetwork = {};
+                
+                // Update connection status after setting networks
+                root.updateConnectionStatus();
             }
         }
     }

@@ -74,7 +74,8 @@ Singleton {
             property bool showCorners: true
             property bool showTaskbar: true
             property bool showMediaInBar: false
-            property bool dimPanels: true
+            property bool barDimmed: true
+            property bool dockDimmed: true
             property real fontSizeMultiplier: 1.0
             property int taskbarIconSize: 24
             
@@ -132,6 +133,9 @@ Singleton {
             property string calendarTodayColor: "#00eeff"
             property string calendarSelectedColor: "#5700eeff"
             property string calendarHolidayColor: "#ff6b6b"
+            property string calendarHolidayCountry: "US"
+            property bool calendarShowHolidays: true
+            property bool calendarShowHolidayTooltips: true
             
             // User settings
             property string userImage: ""

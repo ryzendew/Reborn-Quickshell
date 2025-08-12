@@ -102,20 +102,20 @@ Rectangle {
                         spacing: 12
                         
                         Text {
-                            text: "Dim Panels"
+                            text: "Bar Transparency"
                             font.pixelSize: 14
                             color: "#cccccc"
                         }
                         
                         Item { Layout.fillWidth: true }
                         
-                        // Toggle switch for dim panels
+                        // Toggle switch for bar transparency
                         Rectangle {
                             width: 50
                             height: 24
                             radius: 12
-                            color: Settings.settings.dimPanels ? "#5700eeff" : "#444444"
-                            border.color: Settings.settings.dimPanels ? "#7700eeff" : "#666666"
+                            color: Settings.settings.barDimmed ? "#5700eeff" : "#444444"
+                            border.color: Settings.settings.barDimmed ? "#7700eeff" : "#666666"
                             border.width: 1
                             
                             Rectangle {
@@ -125,7 +125,7 @@ Rectangle {
                                 color: "#ffffff"
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: Settings.settings.dimPanels ? 26 : 2
+                                anchors.leftMargin: Settings.settings.barDimmed ? 26 : 2
                                 
                                 Behavior on anchors.leftMargin {
                                     NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
@@ -135,7 +135,7 @@ Rectangle {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    Settings.settings.dimPanels = !Settings.settings.dimPanels
+                                    Settings.settings.barDimmed = !Settings.settings.barDimmed
                                     saveBarSettings()
                                 }
                             }

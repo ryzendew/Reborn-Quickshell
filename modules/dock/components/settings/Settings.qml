@@ -72,7 +72,8 @@ Singleton {
                 showCorners: true,
                 showTaskbar: true,
                 showMediaInBar: false,
-                dimPanels: true,
+                barDimmed: true,
+                dockDimmed: true,
                 fontSizeMultiplier: 1.0,
                 taskbarIconSize: 24,
                 showDock: true,
@@ -132,7 +133,8 @@ Singleton {
             property bool showCorners: true
             property bool showTaskbar: true
             property bool showMediaInBar: false
-            property bool dimPanels: true
+            property bool barDimmed: true
+            property bool dockDimmed: true
             property real fontSizeMultiplier: 1.0
             property int taskbarIconSize: 24
             

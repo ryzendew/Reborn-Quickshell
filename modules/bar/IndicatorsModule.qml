@@ -373,6 +373,14 @@ Rectangle {
             color: "transparent"
             visible: Network.hasActiveConnection
             
+            // Debug logging for network indicator
+            Component.onCompleted: {
+                console.log("Network indicator: hasActiveConnection =", Network.hasActiveConnection);
+                console.log("Network indicator: hasEthernetConnection =", Network.hasEthernetConnection);
+                console.log("Network indicator: hasWifiConnection =", Network.hasWifiConnection);
+                console.log("Network indicator: networks =", JSON.stringify(Network.networks));
+            }
+            
             // Hover effects - simple magnification
             property bool isHovered: false
             scale: isHovered ? 1.1 : 1.0

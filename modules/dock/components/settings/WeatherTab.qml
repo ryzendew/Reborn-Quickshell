@@ -17,6 +17,26 @@ Rectangle {
         radius: 8
     }
     
+    // Responsive scaling properties
+    property real scaleFactor: Math.max(1.0, Math.min(parent.width / 1920, parent.height / 1080))
+    property real baseSpacing: 24 * scaleFactor
+    property real baseMargin: 12 * scaleFactor
+    property real baseRadius: 12 * scaleFactor
+    property real baseBorderWidth: 1 * scaleFactor
+    
+    // Card heights that scale with display resolution
+    property real currentWeatherHeight: 140 * scaleFactor
+    property real dailyForecastHeight: 290 * scaleFactor
+    property real hourlyForecastHeight: 325 * scaleFactor
+    
+    // Font sizes that scale with display resolution
+    property real largeFontSize: 64 * scaleFactor
+    property real mediumFontSize: 48 * scaleFactor
+    property real normalFontSize: 32 * scaleFactor
+    property real smallFontSize: 24 * scaleFactor
+    property real tinyFontSize: 16 * scaleFactor
+    property real microFontSize: 12 * scaleFactor
+    
     // Weather data properties
     property var currentWeather: ({})
     property var hourlyForecast: []
@@ -73,21 +93,21 @@ Rectangle {
     
     ScrollView {
         anchors.fill: parent
-        anchors.margins: 12
+        anchors.margins: baseMargin
         clip: true
         
         ColumnLayout {
             anchors.fill: parent
-            spacing: 24
+            spacing: baseSpacing
             
             // Current Weather Card
             Rectangle {
                 Layout.fillWidth: true
-                height: 140
+                height: currentWeatherHeight
                 color: "transparent"
-                radius: 12
+                radius: baseRadius
                 border.color: "#33ffffff"
-                border.width: 1
+                border.width: baseBorderWidth
                 
                 // macOS Tahoe-style transparency effect
                 Rectangle {
@@ -123,8 +143,8 @@ Rectangle {
                 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.margins: 24
-                    spacing: 48
+                    anchors.margins: baseMargin * 2
+                    spacing: baseSpacing * 2
                     
                     // Left Section: Weather Icon & Temperature
                     ColumnLayout {
@@ -132,12 +152,12 @@ Rectangle {
                         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                         
                         RowLayout {
-                            spacing: 16
+                            spacing: baseSpacing * 0.67
                             Layout.alignment: Qt.AlignHCenter
                             
                             Text {
                                 text: getWeatherIcon(currentWeather?.current?.condition || "Unknown")
-                                font.pixelSize: 64
+                                font.pixelSize: largeFontSize
                                 color: "#ffffff"
                             }
                             
@@ -145,7 +165,7 @@ Rectangle {
                                 text: currentWeather?.current?.temp ? 
                                     currentWeather.current.temp + (Settings.settings?.useFahrenheit ? "°F" : "°C") : 
                                     "--"
-                                font.pixelSize: 48
+                                font.pixelSize: mediumFontSize
                                 font.weight: Font.Bold
                                 color: "#ffffff"
                             }
@@ -155,7 +175,7 @@ Rectangle {
                             text: currentWeather?.current?.condition ? 
                                 currentWeather.current.condition : 
                                 "Unknown"
-                            font.pixelSize: 32
+                            font.pixelSize: normalFontSize
                             color: "#cccccc"
                             Layout.alignment: Qt.AlignHCenter
                         }
@@ -168,17 +188,15 @@ Rectangle {
                         
                         Text {
                             text: getLocationDisplay()
-                            font.pixelSize: 48
+                            font.pixelSize: mediumFontSize
                             font.weight: Font.Medium
                             color: "#ffffff"
                             Layout.alignment: Qt.AlignHCenter
                         }
                         
-
-                        
                         Text {
                             text: [currentRegion, currentCountry].filter(x => x).join(", ")
-                            font.pixelSize: 14
+                            font.pixelSize: tinyFontSize * 0.875
                             color: "#aaaaaa"
                             Layout.alignment: Qt.AlignHCenter
                         }
@@ -191,16 +209,16 @@ Rectangle {
                         
                         // Feels Like
                         ColumnLayout {
-                            spacing: 4
+                            spacing: 4 * scaleFactor
                             Layout.alignment: Qt.AlignHCenter
                             
                             RowLayout {
-                                spacing: 4
+                                spacing: 4 * scaleFactor
                                 Layout.alignment: Qt.AlignHCenter
                                 
                                 Text {
                                     text: "🌡️"
-                                    font.pixelSize: 56
+                                    font.pixelSize: largeFontSize * 0.875
                                     color: "#ff6b6b"
                                 }
                                 
@@ -208,14 +226,14 @@ Rectangle {
                                     text: currentWeather?.current?.feelsLike ? 
                                         currentWeather.current.feelsLike : 
                                         "--"
-                                    font.pixelSize: 48
+                                    font.pixelSize: mediumFontSize
                                     font.weight: Font.Bold
                                     color: "#ffffff"
                                 }
                                 
                                 Text {
                                     text: Settings.settings?.useFahrenheit ? "°F" : "°C"
-                                    font.pixelSize: 32
+                                    font.pixelSize: normalFontSize
                                     color: "#888888"
                                     font.weight: Font.Medium
                                 }
@@ -223,7 +241,7 @@ Rectangle {
                             
                             Text {
                                 text: "Feels like"
-                                font.pixelSize: 10
+                                font.pixelSize: microFontSize * 0.83
                                 color: "#888888"
                                 font.weight: Font.Medium
                                 Layout.alignment: Qt.AlignHCenter
@@ -232,16 +250,16 @@ Rectangle {
                         
                         // Humidity
                         ColumnLayout {
-                            spacing: 4
+                            spacing: 4 * scaleFactor
                             Layout.alignment: Qt.AlignHCenter
                             
                             RowLayout {
-                                spacing: 4
+                                spacing: 4 * scaleFactor
                                 Layout.alignment: Qt.AlignHCenter
                                 
                                 Text {
                                     text: "💧"
-                                    font.pixelSize: 56
+                                    font.pixelSize: largeFontSize * 0.875
                                     color: "#74b9ff"
                                 }
                                 
@@ -249,14 +267,14 @@ Rectangle {
                                     text: currentWeather?.current?.humidity ? 
                                         currentWeather.current.humidity : 
                                         "--"
-                                    font.pixelSize: 48
+                                    font.pixelSize: mediumFontSize
                                     font.weight: Font.Bold
                                     color: "#ffffff"
                                 }
                                 
                                 Text {
                                     text: "%"
-                                    font.pixelSize: 32
+                                    font.pixelSize: normalFontSize
                                     color: "#888888"
                                     font.weight: Font.Medium
                                 }
@@ -264,7 +282,7 @@ Rectangle {
                             
                             Text {
                                 text: "Humidity"
-                                font.pixelSize: 10
+                                font.pixelSize: microFontSize * 0.83
                                 color: "#888888"
                                 font.weight: Font.Medium
                                 Layout.alignment: Qt.AlignHCenter
@@ -273,16 +291,16 @@ Rectangle {
                         
                         // Wind
                         ColumnLayout {
-                            spacing: 4
+                            spacing: 4 * scaleFactor
                             Layout.alignment: Qt.AlignHCenter
                             
                             RowLayout {
-                                spacing: 4
+                                spacing: 4 * scaleFactor
                                 Layout.alignment: Qt.AlignHCenter
                                 
                                 Text {
                                     text: "💨"
-                                    font.pixelSize: 56
+                                    font.pixelSize: largeFontSize * 0.875
                                     color: "#a29bfe"
                                 }
                                 
@@ -290,14 +308,14 @@ Rectangle {
                                     text: currentWeather?.current?.wind ? 
                                         currentWeather.current.wind : 
                                         "--"
-                                    font.pixelSize: 48
+                                    font.pixelSize: mediumFontSize
                                     font.weight: Font.Bold
                                     color: "#ffffff"
                                 }
                                 
                                 Text {
                                     text: "km/h"
-                                    font.pixelSize: 32
+                                    font.pixelSize: normalFontSize
                                     color: "#888888"
                                     font.weight: Font.Medium
                                 }
@@ -305,7 +323,7 @@ Rectangle {
                             
                             Text {
                                 text: "Wind"
-                                font.pixelSize: 10
+                                font.pixelSize: microFontSize * 0.83
                                 color: "#888888"
                                 font.weight: Font.Medium
                                 Layout.alignment: Qt.AlignHCenter
@@ -318,11 +336,11 @@ Rectangle {
             // 10-Day Forecast
             Rectangle {
                 Layout.fillWidth: true
-                height: 290
+                height: dailyForecastHeight
                 color: "transparent"
-                radius: 12
+                radius: baseRadius
                 border.color: "#33ffffff"
-                border.width: 1
+                border.width: baseBorderWidth
                 
                 // macOS Tahoe-style transparency effect
                 Rectangle {
@@ -358,12 +376,12 @@ Rectangle {
                 
                 ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: 20
-                    spacing: 16
+                    anchors.margins: baseMargin * 1.67
+                    spacing: baseSpacing * 0.67
                     
                     Text {
                         text: "10-Day Forecast"
-                        font.pixelSize: 24
+                        font.pixelSize: smallFontSize
                         font.weight: Font.Bold
                         color: "#ffffff"
                     }
@@ -372,18 +390,18 @@ Rectangle {
                     RowLayout {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        spacing: 12
+                        spacing: baseSpacing * 0.5
                         
                         Repeater {
                             model: dailyForecast.slice(0, 10)
                             
                             Rectangle {
                                 Layout.fillHeight: true
-                                Layout.preferredWidth: 127
+                                Layout.preferredWidth: 127 * scaleFactor
                                 color: "transparent"
-                                radius: 8
+                                radius: baseRadius * 0.67
                                 border.color: "#33ffffff"
-                                border.width: 1
+                                border.width: baseBorderWidth
                                 
                                 // macOS Tahoe-style transparency effect
                                 Rectangle {
@@ -419,30 +437,30 @@ Rectangle {
                                 
                                 ColumnLayout {
                                     anchors.fill: parent
-                                    anchors.margins: 12
-                                    spacing: 8
+                                    anchors.margins: baseMargin
+                                    spacing: baseSpacing * 0.33
                                     
                                     Text {
                                         text: modelData.date || "--"
-                                        font.pixelSize: 16
+                                        font.pixelSize: tinyFontSize
                                         font.weight: Font.Bold
                                         color: "#ffffff"
                                         Layout.alignment: Qt.AlignHCenter
                                     }
                                     
                                     RowLayout {
-                                        spacing: 4
+                                        spacing: 4 * scaleFactor
                                         Layout.alignment: Qt.AlignHCenter
                                         
                                         Text {
                                             text: getWeatherIcon(modelData.condition || "Unknown")
-                                            font.pixelSize: 32
+                                            font.pixelSize: normalFontSize
                                             color: "#ffffff"
                                         }
                                         
                                         Text {
                                             text: (modelData.tempMax || "--") + "°"
-                                            font.pixelSize: 20
+                                            font.pixelSize: tinyFontSize * 1.25
                                             font.weight: Font.Bold
                                             color: "#ffffff"
                                         }
@@ -450,7 +468,7 @@ Rectangle {
                                     
                                     Text {
                                         text: modelData.precipitation ? modelData.precipitation + "%" : ""
-                                        font.pixelSize: 12
+                                        font.pixelSize: microFontSize
                                         color: "#74b9ff"
                                         Layout.alignment: Qt.AlignHCenter
                                         visible: modelData.precipitation && modelData.precipitation > 0
@@ -458,7 +476,7 @@ Rectangle {
                                     
                                     Text {
                                         text: (modelData.tempMin || "--") + "°"
-                                        font.pixelSize: 24
+                                        font.pixelSize: smallFontSize
                                         color: "#aaaaaa"
                                         Layout.alignment: Qt.AlignHCenter
                                     }
@@ -472,11 +490,11 @@ Rectangle {
             // 24-Hour Forecast
             Rectangle {
                 Layout.fillWidth: true
-                height: 325
+                height: hourlyForecastHeight
                 color: "transparent"
-                radius: 12
+                radius: baseRadius
                 border.color: "#33ffffff"
-                border.width: 1
+                border.width: baseBorderWidth
                 
                 // macOS Tahoe-style transparency effect
                 Rectangle {
@@ -512,12 +530,12 @@ Rectangle {
                 
                 ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: 20
-                    spacing: 16
+                    anchors.margins: baseMargin * 1.67
+                    spacing: baseSpacing * 0.67
                     
                     Text {
                         text: "24-Hour Forecast"
-                        font.pixelSize: 24
+                        font.pixelSize: smallFontSize
                         font.weight: Font.Bold
                         color: "#ffffff"
                     }
@@ -529,16 +547,16 @@ Rectangle {
                         
                         ListView {
                             orientation: ListView.Horizontal
-                            spacing: 12
+                            spacing: baseSpacing * 0.5
                             model: hourlyForecast.slice(0, 24)
                             
                             delegate: Rectangle {
-                                width: 140
-                                height: ListView.view.height - 40
+                                width: 140 * scaleFactor
+                                height: ListView.view.height - (40 * scaleFactor)
                                 color: "transparent"
-                                radius: 8
+                                radius: baseRadius * 0.67
                                 border.color: "#33ffffff"
-                                border.width: 1
+                                border.width: baseBorderWidth
                                 
                                 // macOS Tahoe-style transparency effect
                                 Rectangle {
@@ -574,12 +592,12 @@ Rectangle {
                                 
                                 ColumnLayout {
                                     anchors.fill: parent
-                                    anchors.margins: 10
-                                    spacing: 6
+                                    anchors.margins: 10 * scaleFactor
+                                    spacing: 6 * scaleFactor
                                     
                                     Text {
                                         text: modelData.time || "--"
-                                        font.pixelSize: 18
+                                        font.pixelSize: tinyFontSize * 1.125
                                         font.weight: Font.Bold
                                         color: "#ffffff"
                                         Layout.alignment: Qt.AlignHCenter
@@ -587,22 +605,22 @@ Rectangle {
                                     
                                     // Spacer to add space between time and weather icon/temp
                                     Item {
-                                        height: 16
+                                        height: 16 * scaleFactor
                                     }
                                     
                                     RowLayout {
-                                        spacing: 4
+                                        spacing: 4 * scaleFactor
                                         Layout.alignment: Qt.AlignHCenter
                                         
                                         Text {
                                             text: getWeatherIcon(modelData.condition || "Unknown")
-                                            font.pixelSize: 36
+                                            font.pixelSize: normalFontSize * 1.125
                                             color: "#ffffff"
                                         }
                                         
                                         Text {
                                             text: (modelData.temp || "--") + "°"
-                                            font.pixelSize: 20
+                                            font.pixelSize: tinyFontSize * 1.25
                                             font.weight: Font.Bold
                                             color: "#ffffff"
                                         }
@@ -610,12 +628,12 @@ Rectangle {
                                     
                                     // Spacer to add more vertical space
                                     Item {
-                                        height: 16
+                                        height: 16 * scaleFactor
                                     }
                                     
                                     Text {
                                         text: modelData.precipitation ? modelData.precipitation + "%" : ""
-                                        font.pixelSize: 20
+                                        font.pixelSize: tinyFontSize * 1.25
                                         color: "#74b9ff"
                                         Layout.alignment: Qt.AlignHCenter
                                         visible: modelData.precipitation && modelData.precipitation > 0
@@ -623,14 +641,14 @@ Rectangle {
                                     
                                     Text {
                                         text: "💧 " + (modelData.humidity || "--")
-                                        font.pixelSize: 24
+                                        font.pixelSize: smallFontSize
                                         color: "#aaaaaa"
                                         Layout.alignment: Qt.AlignHCenter
                                     }
                                     
                                     Text {
                                         text: "💨 " + (modelData.wind ? modelData.wind.split(" ")[0] : "--")
-                                        font.pixelSize: 24
+                                        font.pixelSize: smallFontSize
                                         color: "#aaaaaa"
                                         Layout.alignment: Qt.AlignHCenter
                                     }

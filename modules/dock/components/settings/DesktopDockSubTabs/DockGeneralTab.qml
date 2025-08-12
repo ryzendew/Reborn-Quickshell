@@ -522,6 +522,58 @@ Rectangle {
                             Layout.preferredWidth: 30
                         }
                     }
+                    
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
+                        
+                        Text {
+                            text: "Transparency"
+                            font.pixelSize: 14
+                            color: "#cccccc"
+                        }
+                        
+                        Item { Layout.fillWidth: true }
+                        
+                        // Transparency toggle switch
+                        Rectangle {
+                            width: 50
+                            height: 24
+                            radius: 12
+                            color: Settings.settings.dockDimmed ? "#5700eeff" : "#444444"
+                            border.color: Settings.settings.dockDimmed ? "#7700eeff" : "#666666"
+                            border.width: 1
+                            
+                            Rectangle {
+                                width: 20
+                                height: 20
+                                radius: 10
+                                color: "#ffffff"
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: Settings.settings.dockDimmed ? 26 : 2
+                                
+                                Behavior on anchors.leftMargin {
+                                    NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                                }
+                            }
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    Settings.settings.dockDimmed = !Settings.settings.dockDimmed
+                                    saveDockSettings()
+                                }
+                            }
+                        }
+                        
+                        Text {
+                            text: Settings.settings.dockDimmed ? "Dimmed" : "Solid"
+                            font.pixelSize: 12
+                            color: "#888888"
+                            Layout.preferredWidth: 40
+                        }
+                    }
                 }
             }
         }
